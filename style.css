@@ -83,6 +83,7 @@ body {
 .nav-links {
     display: flex;
     list-style: none;
+    gap: 2rem; /* Added gap for spacing between navigation items */
 }
 
 .nav-links li a {
@@ -93,7 +94,7 @@ body {
 }
 
 .nav-links li {
-    margin: 0 1rem;
+    /* margin: 0 1rem; - Removed as gap is now used */
 }
 
 .nav-links li a:hover {
@@ -421,10 +422,11 @@ body {
 
     .nav-links.active {
         right: 0;
+        z-index: 1002; /* Ensure it's above other elements */
     }
 
     .nav-links li {
-        margin: 1.5rem 0;
+        /* margin: 1.5rem 0; - Removed, relying on gap */
     }
 
     .nav-links li a {
