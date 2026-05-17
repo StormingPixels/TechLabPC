@@ -51,6 +51,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1400px; /* Verhoogd van 1200px om meer ruimte aan de zijkanten te geven */
+    padding: 0 10px;   /* Verlaagd van 20px om het logo dichter bij de rand te zetten */
 }
 
 .logo {
