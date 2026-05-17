@@ -134,9 +134,13 @@ body {
     display: flex;
 }
 
+.goog-te-gadget a {
+    display: none !important; /* Verbergt de "Powered by Google" link */
+}
+
 .goog-te-gadget {
     font-family: 'Roboto', sans-serif !important;
-    font-size: 0 !important; /* Verbergt 'Powered by Google' tekst */
+    /* font-size: 0 !important; -- Deze regel is verwijderd */
 }
 
 .goog-te-gadget .goog-te-combo {
