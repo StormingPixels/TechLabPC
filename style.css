@@ -425,7 +425,7 @@ body {
     }
 
     .nav-links li {
-        /* margin: 1.5rem 0; - Removed, relying on gap */
+        margin: 1.5rem 0;
     }
 
     .nav-links li a {
