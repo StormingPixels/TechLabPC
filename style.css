@@ -102,6 +102,15 @@ body {
     border-bottom: 2px solid var(--accent-color);
 }
 
+/* Verberg de Google Translate iframe balk bovenin */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+}
+
+body {
+    top: 0px !important;
+}
+
 /* Google Translate Styling */
 #google_translate_element {
     margin-left: 2rem;
