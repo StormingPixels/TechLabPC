@@ -451,7 +451,7 @@ body {
     .hero h1 { font-size: 2.2rem; }
     
     /* Zorg dat de console grid ook naar 1 kolom gaat op mobiel */
-    div[style*="grid-template-columns: repeat(3, 1fr)"], div[style*="grid-template-columns: repeat(2, 1fr)"] {
+    div[style*="grid-template-columns: repeat(4, 1fr)"], div[style*="grid-template-columns: repeat(3, 1fr)"], div[style*="grid-template-columns: repeat(2, 1fr)"] {
         grid-template-columns: 1fr !important;
     }
 }
