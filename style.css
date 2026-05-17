@@ -148,6 +148,11 @@ body {
     background-color: #25d366;
 }
 
+.btn-tiktok {
+    background-color: #000000;
+    margin-left: 10px;
+}
+
 /* Star Rating Input in Form */
 .star-rating {
     display: flex;
