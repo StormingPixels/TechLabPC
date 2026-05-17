@@ -102,6 +102,24 @@ body {
     border-bottom: 2px solid var(--accent-color);
 }
 
+/* Google Translate Styling */
+#google_translate_element {
+    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.goog-te-gadget {
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 0 !important; /* Verbergt 'Powered by Google' tekst */
+}
+
+.goog-te-gadget .goog-te-combo {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
 /* Hero Section */
 .hero {
     height: 80vh;
@@ -427,6 +445,11 @@ body {
     .nav-links li a {
         margin-left: 0;
         font-size: 1.2rem;
+    }
+
+    #google_translate_element {
+        margin-left: 0;
+        margin-bottom: 1.5rem;
     }
 
     .services-grid { grid-template-columns: 1fr; }
