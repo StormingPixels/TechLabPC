@@ -51,8 +51,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1400px; /* Verhoogd van 1200px om meer ruimte aan de zijkanten te geven */
-    padding: 0 10px;   /* Verlaagd van 20px om het logo dichter bij de rand te zetten */
 }
 
 .logo {
@@ -85,18 +83,17 @@ body {
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 2rem; /* Added gap for spacing between navigation items */
 }
 
 .nav-links li a {
     color: var(--text-main);
     text-decoration: none;
+    margin-left: 2rem;
     transition: color 0.3s;
     font-weight: 500;
 }
 
 .nav-links li {
-    /* margin: 0 1rem; - Removed as gap is now used */
 }
 
 .nav-links li a:hover {
@@ -438,6 +435,7 @@ body {
 
     .navbar .container {
         justify-content: space-between;
+        padding: 0 20px; /* Minder padding op mobiel om ruimte te besparen */
     }
 
     .logo {
