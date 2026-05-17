@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | TechLabPC</title>
+    <link rel="canonical" href="https://StormingPixels.github.io/TechLabPC/contact.html">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">TechLabPC</a>
+            <button class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="diensten.html">Diensten</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+                <li><a href="over-mij.html">Over Mij</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="contact" class="contact page-start">
+        <div class="container">
+            <h2 class="section-title">Neem Contact Op</h2>
+            <div class="contact-split">
+                <div class="contact-form-container">
+                    <form action="https://formspree.io/f/xykorala" method="POST" class="contact-form">
+                        <input type="text" name="name" placeholder="Uw Naam" required>
+                        <input type="email" name="email" placeholder="Uw E-mailadres" required>
+                        <select name="subject" id="service-select" required>
+                            <option value="" disabled selected>Kies een dienst...</option>
+                            <optgroup label="PC en Laptop">
+                                <option value="Basis PC-check">Basis PC-check</option>
+                                <option value="Upgrade en onderhoud">Upgrade en onderhoud</option>
+                                <option value="Custom PC-bouw">Custom PC-bouw</option>
+                                <option value="Probleemoplossing">Probleemoplossing</option>
+                                <option value="PC-Reiniging">PC-Reiniging</option>
+                            </optgroup>
+                            <optgroup label="Consoles">
+                                <option value="Console Reiniging">Console Reiniging</option>
+                                <option value="Opslag Upgrade">Opslag Upgrade</option>
+                                <option value="Controller Modding">Controller Modding</option>
+                            </optgroup>
+                            <option value="Anders">Anders...</option>
+                        </select>
+                        <div id="other-service-container" class="hidden">
+                            <input type="text" name="other_service_description" placeholder="Waarom mailt u ons? (vul uw reden in)">
+                        </div>
+                        <div id="controller-mods-container" class="hidden">
+                            <p style="margin-bottom: 0.5rem; font-weight: bold; font-size: 0.9rem;">Selecteer de gewenste mods:</p>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="checkbox" name="mod[]" value="Back Paddles"> Back Paddles</label>
+                                <label class="checkbox-item"><input type="checkbox" name="mod[]" value="Trigger Stops"> Trigger Stops</label>
+                                <label class="checkbox-item"><input type="checkbox" name="mod[]" value="Hall Effect Sensors"> Hall Effect Sensors</label>
+                                <label class="checkbox-item"><input type="checkbox" name="mod[]" value="Custom Shells"> Custom Shells</label>
+                            </div>
+                        </div>
+                        <textarea name="message" rows="6" placeholder="Uw Bericht" required></textarea>
+                        <button type="submit" class="btn">Verstuur Bericht</button>
+                    </form>
+                </div>
+                <div class="contact-info">
+                    <h3>Bezoek ons</h3>
+                    <p>Adres op aanvraag via formulier.</p>
+                    <p>Telefoon: +31 6 43276854</p>
+                    <p>E-mail: TechLabPCContact@gmail.com</p>
+                    <a href="https://api.whatsapp.com/send?phone=31643276854" class="btn btn-whatsapp">WhatsApp ons</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="review-form-section" class="review-section" style="padding: 60px 0; background: var(--section-alt);">
+        <div class="container">
+            <h2 class="section-title">Schrijf een recensie</h2>
+            <p class="section-subtitle">Bent u geholpen door TechLabPC? Deel uw ervaring met anderen!</p>
+            <div class="contact-form-container" style="max-width: 600px; margin: 0 auto;">
+                <form id="review-form" class="contact-form">
+                    <input type="text" id="rev-name" placeholder="Uw Naam" required>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 sterren"></label>
+                        <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 sterren"></label>
+                        <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 sterren"></label>
+                        <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 sterren"></label>
+                        <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 sterren"></label>
+                    </div>
+                    <textarea id="rev-text" rows="4" placeholder="Uw recensie..." required></textarea>
+                    <button type="submit" class="btn" id="submit-rev-btn">Recensie Versturen</button>
+                </form>
+                <p id="review-status" style="margin-top: 10px; display: none;"></p>
+            </div>
+            <div class="testimonial-cta">
+                <a href="alle-recensies.html" class="btn btn-secondary">Bekijk alle recensies</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 TechLabPC. Alle rechten voorbehouden.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Form Toggle logic
+        document.getElementById('service-select').addEventListener('change', function() {
+            const otherContainer = document.getElementById('other-service-container');
+            const modsContainer = document.getElementById('controller-mods-container');
+            
+            const isOther = this.value === 'Anders';
+            const isModding = this.value === 'Controller Modding';
+
+            otherContainer.classList.toggle('hidden', !isOther);
+            otherContainer.querySelector('input').required = isOther;
+            if (!isOther) otherContainer.querySelector('input').value = '';
+
+            modsContainer.classList.toggle('hidden', !isModding);
+        });
+
+        // Supabase Review Script
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        const reviewForm = document.getElementById('review-form');
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('rev-name').value;
+            const text = document.getElementById('rev-text').value;
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const btn = document.getElementById('submit-rev-btn');
+            const status = document.getElementById('review-status');
+
+            btn.disabled = true;
+            btn.innerText = 'Versturen...';
+
+            const { error } = await supabaseClient
+                .from('reviews')
+                .insert([{ name, text, rating: parseInt(rating) }]);
+
+            if (error) {
+                console.error('Supabase fout:', error);
+                status.innerText = 'Er ging iets mis. Probeer het later opnieuw.';
+                status.style.color = 'red';
+            } else {
+                status.innerText = 'Bedankt! Je recensie is geplaatst.';
+                status.style.color = 'green';
+                reviewForm.reset();
+            }
+            status.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = 'Recensie Versturen';
+        });
+
+        // Mobile Menu Logic
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

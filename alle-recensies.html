@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alle Recensies | TechLabPC</title>
+    <link rel="canonical" href="https://StormingPixels.github.io/TechLabPC/alle-recensies.html">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">TechLabPC</a>
+            <button class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="diensten.html">Diensten</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="over-mij.html">Over Mij</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="testimonials page-start">
+        <div class="container">
+            <h2 class="section-title">Alle Klantbeoordelingen</h2>
+            <p class="section-subtitle">Lees hier de volledige ervaringen van klanten die u voorgingen.</p>
+            <div id="average-stats" class="average-rating-display">Berekenen...</div>
+            
+            <div id="all-reviews-container" class="testimonial-grid" style="grid-template-columns: 1fr;">
+                <!-- Recensies worden hier automatisch geladen via JS -->
+            </div>
+
+            <div class="testimonial-cta">
+                <a href="contact.html" class="btn">Zelf een recensie schrijven</a>
+                <a href="index.html" class="btn btn-secondary">Terug naar Home</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 TechLabPC. Alle rechten voorbehouden.</p>
+        </div>
+    </footer>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function fetchAllReviews() {
+            const { data, error } = await supabaseClient
+                .from('reviews')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) { console.error('Fout:', error); return; }
+            
+            // Bereken gemiddelde
+            const average = data.length > 0 
+                ? (data.reduce((acc, curr) => acc + (curr.rating || 5), 0) / data.length).toFixed(1) 
+                : 0;
+            
+            document.getElementById('average-stats').innerHTML = data.length > 0 
+                ? `Gemiddelde score: ${average} / 5 ★ (${data.length} recensies)` 
+                : 'Nog geen scores beschikbaar';
+
+            const container = document.getElementById('all-reviews-container');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p>Nog geen recensies beschikbaar.</p>';
+                return;
+            }
+
+            const getStars = (r) => '★'.repeat(r || 5) + '☆'.repeat(5 - (r || 5));
+            container.innerHTML = data.map(rev => `
+                <div class="testimonial-card" style="margin-bottom: 2rem;">
+                    <div class="stars">${getStars(rev.rating)}</div>
+                    <p>"${rev.text}"</p>
+                    <span>- ${rev.name}</span>
+                </div>
+            `).join('');
+        }
+
+        // Mobile Menu Logic
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        fetchAllReviews();
+    </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://StormingPixels.github.io/TechLabPC/sitemap.xml

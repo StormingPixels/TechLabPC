@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechLabPC | Uw Hardware Expert</title>
+    <meta name="description" content="TechLabPC is uw specialist voor computerreparatie, custom PC-bouw en onderhoud. Professionele service tegen de scherpste prijs.">
+    <meta name="keywords" content="computer reparatie, PC bouw, hardware expert, TechLabPC, laptop onderhoud">
+    <link rel="canonical" href="https://StormingPixels.github.io/TechLabPC/">
+    
+    <!-- Google Search Console Verificatie -->
+    <meta name="google-site-verification" content="HIER_KOMT_JOUW_CODE_VAN_GOOGLE" />
+    
+    <!-- Open Graph voor social media (WhatsApp, Facebook) -->
+    <meta property="og:title" content="TechLabPC | Uw Hardware Expert">
+    <meta property="og:url" content="https://StormingPixels.github.io/TechLabPC/">
+    <meta property="og:description" content="Specialist in custom PC's en hardware onderhoud.">
+    <meta property="og:image" content="https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">TechLabPC</a>
+            <button class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="diensten.html">Diensten</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="over-mij.html">Over Mij</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="container">
+            <h1>TechLabPC: uw computerspecialist</h1>
+            <p>Welkom bij TechLabPC, waar uw computerwensen werkelijkheid worden. Wij zijn gespecialiseerd in alles wat met pc's te maken heeft.</p>
+            <a href="diensten.html" class="btn">Ontdek onze diensten</a>
+        </div>
+    </header>
+
+    <section id="services" class="services">
+        <div class="container">
+            <span class="section-tagline">Specialist in PC's en Laptops</span>
+            <h2 class="section-title">Onze servicepakketten</h2>
+            <p class="section-subtitle">TechLabPC biedt diverse servicepakketten aan, afgestemd op uw specifieke behoeften.</p>
+            <div class="services-grid">
+                <div class="service-card">
+                    <img src="https://primary.jwwb.nl/pexels/11/11047223.jpeg" alt="Basis PC-check">
+                    <h3>Basis PC-check</h3>
+                    <p>Geef je computer een tweede leven. Wij maken de pc stofvrij en voeren een hardware-inspectie uit op alle vitale onderdelen.</p>
+                    <a href="diensten.html#basis-check" class="read-more-link">Meer lezen</a>
+                </div>
+                <div class="service-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/14018/14018797.png" alt="Upgrade">
+                    <h3>Upgrade en onderhoud</h3>
+                    <p>Is je computer traag? Met slimme upgrades en professioneel onderhoud maken we je huidige computer weer zo snel als nieuw.</p>
+                    <a href="diensten.html#upgrade" class="read-more-link">Meer lezen</a>
+                </div>
+                <div class="service-card">
+                    <img src="https://hyte.com/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fmqc7p4g4%2Fproduction%2F71adfae468aa478cd09132ab25ce9f393cd81a27-1080x721.jpg&w=750&q=75" alt="Custom PC">
+                    <h3>Custom PC-bouw</h3>
+                    <p>Wij bouwen jouw droom-computer op maat. Van high-end gaming tot werkstation: wij kiezen de beste onderdelen binnen uw budget.</p>
+                    <a href="diensten.html#custom-build" class="read-more-link">Meer lezen</a>
+                </div>
+                <div class="service-card">
+                    <img src="https://strategischlui.nl/wp-content/uploads/2010/02/computer-crash.jpg" alt="Probleemoplossing">
+                    <h3>Probleemoplossing</h3>
+                    <p>Start je pc niet meer op of heb je last van een blauw scherm? Wij sporen hardware- en softwarefouten snel op en lossen het op.</p>
+                    <a href="diensten.html#reparatie" class="read-more-link">Meer lezen</a>
+                </div>
+                <div class="service-card">
+                    <img src="https://i.redd.it/cacy11fd5ss91.jpg" alt="Reiniging">
+                    <h3>PC-Reiniging</h3>
+                    <p>Zorg dat je pc weer fluisterstil wordt en optimaal gekoeld blijft door een grondige reiniging en nieuwe koelpasta.</p>
+                    <a href="diensten.html#reiniging" class="read-more-link">Meer lezen</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="margin-top: 80px;">
+            <span class="section-tagline">Onderhoud & Reparatie voor Consoles</span>
+            <h2 class="section-title">Console Services</h2>
+            <p class="section-subtitle">Naast computers werken wij ook aan uw PlayStation, Xbox of Nintendo Switch.</p>
+            <div class="services-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="service-card">
+                    <img src="https://i.ytimg.com/vi/Ecsui7YiB8Y/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCZ0EqdfyAnn0223aQdsJrufsKVDQ" alt="Console Reiniging">
+                    <h3>Console Reiniging</h3>
+                    <p>Maak je PS4, PS5 of Xbox weer fluisterstil met een grondige reiniging en nieuwe koelpasta.</p>
+                    <a href="diensten.html#console-reiniging" class="read-more-link">Meer lezen</a>
+                </div>
+                <div class="service-card">
+                    <img src="https://images.paradigit.nl/picture/21650888/380/300" alt="Console Upgrade">
+                    <h3>Opslag Upgrade</h3>
+                    <p>Meer ruimte voor al je games? Wij installeren een snellere en grotere SSD in uw console.</p>
+                    <a href="diensten.html#console-upgrade" class="read-more-link">Meer lezen</a>
+                </div>
+                <div class="service-card">
+                    <img src="https://xboxdesignlab.xbox.com/media/wysiwyg/standard_wireless_controller/canvas_of_components/XDL_Standard-Wireless-Controller_Custom-Image-Priority-Image-0_03_1040x867_02.jpg" alt="Controller Modding">
+                    <h3>Controller Modding</h3>
+                    <p>Geef je controller een voorsprong met professionele mods voor PlayStation en Xbox. Van betere grip tot extra knoppen.</p>
+                    <a href="diensten.html#controller-modding" class="read-more-link">Meer lezen</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Wat onze klanten zeggen</h2>
+            <div id="reviews-container" class="testimonial-grid">
+                <!-- Recensies worden hier automatisch geladen via JS -->
+            </div>
+            <div class="testimonial-cta">
+                <a href="contact.html" class="btn">Schrijf een recensie</a>
+                <a href="alle-recensies.html" class="btn btn-secondary">Bekijk alle recensies</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 TechLabPC. Alle rechten voorbehouden.</p>
+        </div>
+    </footer>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function fetchReviews() {
+            const { data, error } = await supabaseClient
+                .from('reviews')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(2);
+
+            if (error) return console.error('Fout:', error);
+            
+            const container = document.getElementById('reviews-container');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p>Nog geen recensies beschikbaar.</p>';
+                return;
+            }
+
+            const getStars = (r) => '★'.repeat(r || 5) + '☆'.repeat(5 - (r || 5));
+            container.innerHTML = data.map(rev => `
+                <div class="testimonial-card">
+                    <div class="stars">${getStars(rev.rating)}</div>
+                    <p>"${rev.text}"</p>
+                    <span>- ${rev.name}</span>
+                </div>
+            `).join('');
+        }
+
+        // Mobile Menu Logic
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        fetchReviews();
+    </script>
+</body>
+</html>
