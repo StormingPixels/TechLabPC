@@ -109,8 +109,16 @@ body {
 }
 
 /* Verberg de Google Translate iframe balk bovenin */
-.goog-te-banner-frame.skiptranslate {
+.goog-te-banner-frame, 
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip:hover,
+#goog-gt-tt {
     display: none !important;
+}
+
+html {
+    top: 0 !important;
 }
 
 body {
