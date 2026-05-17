@@ -108,48 +108,6 @@ body {
     border-bottom: 2px solid var(--accent-color);
 }
 
-/* Verberg de Google Translate iframe balk bovenin */
-.goog-te-banner-frame, 
-.goog-te-balloon-frame,
-.goog-tooltip,
-.goog-tooltip:hover,
-#goog-gt-tt {
-    display: none !important;
-}
-
-html {
-    top: 0 !important;
-}
-
-body {
-    top: 0px !important;
-}
-
-/* Google Translate Styling */
-#google_translate_element {
-    position: fixed;
-    top: 25px;
-    right: 20px;
-    z-index: 2000;
-    display: flex;
-}
-
-.goog-te-gadget a {
-    display: none !important; /* Verbergt de "Powered by Google" link */
-}
-
-.goog-te-gadget {
-    font-family: 'Roboto', sans-serif !important;
-    /* font-size: 0 !important; -- Deze regel is verwijderd */
-}
-
-.goog-te-gadget .goog-te-combo {
-    padding: 5px;
-    font-size: 14px !important; /* Forceer leesbare tekst in het menu */
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
-
 /* Hero Section */
 .hero {
     height: 80vh;
@@ -483,11 +441,6 @@ body {
 
     .logo {
         position: static;
-    }
-
-    #google_translate_element {
-        top: 20px;
-        right: 70px; /* Voorkom overlap met het menu-icoon */
     }
 
     .services-grid { grid-template-columns: 1fr; }
