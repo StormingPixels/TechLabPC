@@ -57,7 +57,6 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--accent-color);
-    font-family: 'Roboto', sans-serif;
     text-decoration: none;
 }
 
@@ -93,9 +92,6 @@ body {
     font-weight: 500;
 }
 
-.nav-links li {
-}
-
 .nav-links li a:hover {
     color: var(--accent-color);
 }
@@ -122,7 +118,6 @@ body {
 .hero h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
-    font-family: 'Roboto', sans-serif;
 }
 
 .btn {
@@ -228,14 +223,12 @@ body {
 .section-title, 
 .about-text h2, 
 .side-text h2 { 
-    font-family: 'Roboto', sans-serif; 
     font-size: 2.5rem; 
     margin-bottom: 1rem; 
     font-weight: 700;
 }
 .section-title { text-align: center; }
 .section-subtitle { text-align: center; margin-bottom: 3rem; color: var(--text-dim); }
-
 .services-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -257,7 +250,6 @@ body {
 }
 
 .service-card h3 { 
-    font-family: 'Roboto', sans-serif;
     font-size: 1.3rem; 
     margin-bottom: 0.5rem; 
 }
@@ -307,6 +299,12 @@ body {
     color: var(--star-color);
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
+}
+
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
 }
 
 .average-rating-display {
@@ -370,29 +368,8 @@ body {
     display: none;
 }
 
-/* Checkbox styles for Controller Mods */
-.checkbox-group {
-    background: #fff;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-}
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-    cursor: pointer;
-}
-.checkbox-item input[type="checkbox"] {
-    width: auto;
-    margin-bottom: 0;
-}
-
 .review-section {
-    scroll-margin-top: var(--nav-height); /* Zorgt dat de sectie niet achter de navbar verdwijnt */
+    scroll-margin-top: var(--nav-height);
 }
 
 /* Footer */
@@ -414,7 +391,6 @@ body {
 
 @media (max-width: 768px) {
     .menu-toggle { display: flex; }
-
     .nav-links {
         position: fixed;
         top: 0;
@@ -428,30 +404,10 @@ body {
         transition: 0.4s;
         box-shadow: -5px 0 15px rgba(0,0,0,0.1);
     }
-
-    .nav-links.active {
-        right: 0;
-        z-index: 1002; /* Ensure it's above other elements */
-    }
-
-    .nav-links li {
-        margin: 1.5rem 0;
-    }
-
-    .nav-links li a {
-        margin-left: 0;
-        font-size: 1.2rem;
-    }
-
-    .navbar .container {
-        justify-content: space-between;
-        padding: 0 20px; /* Minder padding op mobiel om ruimte te besparen */
-    }
-
-    .logo {
-        position: relative;
-    }
-
+    .nav-links.active { right: 0; z-index: 1002; }
+    .nav-links li { margin: 1.5rem 0; }
+    .nav-links li a { margin-left: 0; font-size: 1.2rem; }
+    .navbar .container { justify-content: space-between; padding: 0 20px; }
     .services-grid { grid-template-columns: 1fr; }
     .about-content, .split-section, .contact-split {
         grid-template-columns: 1fr;
@@ -459,9 +415,4 @@ body {
     }
     .testimonial-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 2.2rem; }
-    
-    /* Zorg dat de console grid ook naar 1 kolom gaat op mobiel */
-    div[style*="grid-template-columns: repeat(4, 1fr)"], div[style*="grid-template-columns: repeat(3, 1fr)"], div[style*="grid-template-columns: repeat(2, 1fr)"] {
-        grid-template-columns: 1fr !important;
-    }
 }
