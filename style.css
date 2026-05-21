@@ -225,7 +225,15 @@ body {
     margin-bottom: 0.5rem;
     display: block;
 }
-.section-title { text-align: center; margin-bottom: 1rem; font-size: 2.5rem; font-family: 'Playfair Display', serif; }
+.section-title, 
+.about-text h2, 
+.side-text h2 { 
+    font-family: 'Roboto', sans-serif; 
+    font-size: 2.5rem; 
+    margin-bottom: 1rem; 
+    font-weight: 700;
+}
+.section-title { text-align: center; }
 .section-subtitle { text-align: center; margin-bottom: 3rem; color: var(--text-dim); }
 
 .services-grid {
@@ -248,7 +256,11 @@ body {
     margin-bottom: 1rem;
 }
 
-.service-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+.service-card h3 { 
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.3rem; 
+    margin-bottom: 0.5rem; 
+}
 .service-card p { font-size: 0.9rem; color: var(--text-dim); }
 
 .service-card, details, summary, .read-more-link { 
