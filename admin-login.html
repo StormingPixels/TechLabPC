@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">TechLabPC Admin</a>
+        </div>
+    </nav>
+
+    <section class="contact page-start">
+        <div class="container" style="max-width: 400px;">
+            <h2 class="section-title">Inloggen</h2>
+            <form id="login-form" class="contact-form">
+                <input type="text" id="username" placeholder="Gebruikersnaam" required>
+                <input type="password" id="password" placeholder="Wachtwoord" required>
+                <button type="submit" class="btn">Inloggen</button>
+            </form>
+            <p id="status" style="margin-top: 1rem; color: red; display: none;"></p>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usernameInput = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const status = document.getElementById('status');
+
+            // 1. Zoek het emailadres dat bij de gebruikersnaam hoort
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('email')
+                .eq('username', usernameInput)
+                .single();
+
+            // Als we een profiel vinden, gebruiken we dat emailadres. Anders proberen we de input zelf.
+            const email = profile ? profile.email : usernameInput;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                status.innerText = "Fout: " + error.message;
+                status.style.display = "block";
+            } else {
+                window.location.href = 'admin-panel.html';
+            }
+        });
+    </script>
+</body>
+</html>
