@@ -422,17 +422,13 @@ body {
 }
 .service-card p { font-size: 0.9rem; color: var(--text-dim); }
 
-.service-card, details, summary, .read-more-link { 
+.read-more-link { 
     scroll-margin-top: 100px;
     cursor: pointer; 
     color: var(--accent-color); 
     font-weight: bold; 
     margin-top: 0.5rem; 
     display: inline-block;
-    text-decoration: none;
-    text-transform: none;
-    letter-spacing: normal;
-    font-size: 1rem;
 }
 
 /* Split Sections */
