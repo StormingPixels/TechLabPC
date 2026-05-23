@@ -1,0 +1,21 @@
+{
+  "name": "TechLabPC Admin",
+  "short_name": "TLPC Admin",
+  "description": "Beheerpaneel voor TechLabPC",
+  "start_url": "admin-panel.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#A8B090",
+  "icons": [
+    {
+      "src": "https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

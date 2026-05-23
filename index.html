@@ -8,6 +8,10 @@
     <meta name="keywords" content="computer reparatie, PC bouw, hardware expert, TechLabPC, laptop onderhoud">
     <link rel="canonical" href="https://techlabpc.nl/">
     
+    <!-- PWA Instellingen -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#A8B090">
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png">
 
@@ -148,6 +152,13 @@
     </footer>
 
     <script>
+        // Register Service Worker voor PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+
         const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
