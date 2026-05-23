@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | TechLabPC</title>
+    <link rel="canonical" href="https://techlabpc.nl/admin-panel.html">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">TechLabPC</a>
+            <button class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="diensten.html">Diensten</a></li>
+                <li><a href="ons-werk.html">Ons Werk</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="over-mij.html">Over Mij</a></li>
+                <li><a href="admin-login.html" class="active">Admin Panel</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="admin-panel" class="page-start" style="padding: 100px 0;">
+        <div class="container" style="max-width: 600px; margin: 0 auto;">
+            <h2 id="admin-greeting" class="section-title" style="font-size: 1.5rem; color: var(--text-dim); margin-bottom: 0.5rem; text-align: left;">Bezig met laden...</h2>
+            <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Project Toevoegen</h2>
+            <form id="add-project-form" class="contact-form">
+                <input type="text" id="project-title" placeholder="Project Titel" required>
+                <textarea id="project-description" rows="4" placeholder="Project Beschrijving" required></textarea>
+                <input type="url" id="project-image-url" placeholder="Afbeelding URL" required>
+                <button type="submit" class="btn" id="add-project-btn">Project Toevoegen</button>
+                <p id="project-status" style="margin-top: 15px; display: none;"></p>
+            </form>
+            <button id="logout-btn" class="btn btn-secondary" style="margin-top: 20px;">Uitloggen</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 TechLabPC. Alle rechten voorbehouden.</p>
+        </div>
+    </footer>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Check if user is logged in
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            // Haal de display_name op uit de profiles tabel
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('display_name')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            const greetingElement = document.getElementById('admin-greeting');
+            if (profile && profile.display_name) {
+                greetingElement.innerText = `Welkom terug, ${profile.display_name}!`;
+            } else {
+                greetingElement.innerText = "Welkom terug, Admin!";
+            }
+        }
+        checkAuth();
+
+        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('project-title').value;
+            const description = document.getElementById('project-description').value;
+            const imageUrl = document.getElementById('project-image-url').value;
+            const addProjectBtn = document.getElementById('add-project-btn');
+            const projectStatus = document.getElementById('project-status');
+
+            addProjectBtn.disabled = true;
+            addProjectBtn.innerText = 'Project toevoegen...';
+            projectStatus.style.display = 'none';
+
+            const { error } = await supabaseClient.from('projects').insert([{ title, description, imageUrl }]);
+
+            if (error) {
+                projectStatus.innerText = 'Fout bij toevoegen project: ' + error.message;
+                projectStatus.style.color = 'red';
+            } else {
+                projectStatus.innerText = 'Project succesvol toegevoegd!';
+                projectStatus.style.color = 'green';
+                document.getElementById('add-project-form').reset();
+            }
+            projectStatus.style.display = 'block';
+            addProjectBtn.disabled = false;
+            addProjectBtn.innerText = 'Project Toevoegen';
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            const { error } = await supabaseClient.auth.signOut();
+            if (!error) {
+                window.location.href = 'admin-login.html';
+            } else {
+                console.error('Fout bij uitloggen:', error);
+            }
+        });
+
+        // Mobile Menu Logic
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
