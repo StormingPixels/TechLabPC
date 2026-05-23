@@ -42,7 +42,7 @@
 
     <section id="admin-panel" class="page-start" style="padding: 100px 0;">
         <div class="container" style="max-width: 800px; margin: 0 auto;">
-            <h2 id="admin-greeting" class="section-title" style="text-align: left;">Welkom, beheerder</h2>
+            <h2 id="admin-greeting" class="section-title" style="text-align: left;">Welkom...</h2>
             
             <div class="admin-grid">
                 <a href="admin-agenda.html" class="btn" style="text-align: center; margin: 0; padding: 3rem 1rem;">
@@ -103,6 +103,8 @@
 
             if (profile && profile.display_name) {
                 document.getElementById('admin-greeting').innerText = `Welkom, ${profile.display_name}`;
+            } else {
+                document.getElementById('admin-greeting').innerText = `Welkom, beheerder`;
             }
         }
         checkAuth();
