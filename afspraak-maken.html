@@ -14,8 +14,10 @@
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="diensten.html">Diensten</a></li>
-                <li><a href="afspraak-maken.html" class="active">Afspraak</a></li>
+                <li><a href="ons-werk.html">Ons Werk</a></li>
                 <li><a href="contact.html">Contact</a></li>
+                <li><a href="over-mij.html">Over Mij</a></li>
+                <li><a href="admin-login.html">Admin Login</a></li>
             </ul>
         </div>
     </nav>
@@ -65,34 +67,35 @@
             const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
             if (todaysHours.is_closed || currentTimeStr < todaysHours.open_time || currentTimeStr >= todaysHours.close_time) {
-                grid.innerHTML = `<div style="background:#f8d7da; padding:20px; border-radius:10px; color:#721c24; text-align:center;"><strong>GESLOTEN</strong><br>Buiten openingstijden kunt u geen afspraak plannen.<br>Vandaag zijn we ${todaysHours.is_closed ? 'gesloten' : `geopend van ${todaysHours.open_time.slice(0,5)} tot ${todaysHours.close_time.slice(0,5)}`}.</div>`;
-                return;
+                grid.innerHTML = `<div style="background:#fff3cd; padding:20px; border-radius:10px; color:#856404; text-align:center; border: 1px solid #ffeeba;">
+                    <strong>LET OP: Buiten openingstijden</strong><br>
+                    U kunt momenteel geen tijdstip selecteren omdat wij gesloten zijn. Kom morgen terug of gebruik het <a href="contact.html" style="color: inherit; text-decoration: underline;">contactformulier</a> voor vragen.
+                </div>`;
+            } else {
+                const { data, error } = await supabaseClient
+                    .from('schedule')
+                    .select('*')
+                    .gte('start_time', now.toISOString())
+                    .order('start_time', { ascending: true });
+
+                if (!data || data.length === 0) {
+                    grid.innerHTML = '<div style="background:#f4f4f4; padding:20px; border-radius:10px; text-align:center;"><strong>GEEN SLOTS BESCHIKBAAR</strong><br>Er zijn momenteel geen vrije momenten gepland voor vandaag.</div>';
+                } else {
+                    grid.innerHTML = data.map(slot => {
+                        const d = new Date(slot.start_time);
+                        const isBooked = slot.status === 'booked';
+                        return `
+                            <button class="btn ${isBooked ? 'btn-secondary' : 'btn-outline'}" 
+                                    style="margin:0; text-align:left; opacity: ${isBooked ? '0.6' : '1'};" 
+                                    onclick="${isBooked ? '' : `selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')`}"
+                                    ${isBooked ? 'disabled' : ''}>
+                                ${d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })} om ${d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
+                                ${isBooked ? ' - (AL BEZET)' : ''}
+                            </button>
+                        `;
+                    }).join('');
+                }
             }
-
-            const { data, error } = await supabaseClient
-                .from('schedule')
-                .select('*')
-                .gte('start_time', now.toISOString())
-                .order('start_time', { ascending: true });
-
-            if (!data || data.length === 0) {
-                grid.innerHTML = '<div style="background:#fff3cd; padding:20px; border-radius:10px; color:#856404; text-align:center;"><strong>BEZET / VOLGEBOEKT</strong><br>Er zijn momenteel geen vrije momenten meer tijdens openingstijden. Probeer het later opnieuw.</div>';
-                return;
-            }
-
-            grid.innerHTML = data.map(slot => {
-                const d = new Date(slot.start_time);
-                const isBooked = slot.status === 'booked';
-                return `
-                    <button class="btn ${isBooked ? 'btn-secondary' : 'btn-outline'}" 
-                            style="margin:0; text-align:left; opacity: ${isBooked ? '0.6' : '1'};" 
-                            onclick="${isBooked ? '' : `selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')`}"
-                            ${isBooked ? 'disabled' : ''}>
-                        ${d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })} om ${d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
-                        ${isBooked ? ' - (AL BEZET)' : ''}
-                    </button>
-                `;
-            }).join('');
         }
 
         window.selectSlot = (id, label) => {
