@@ -41,7 +41,8 @@
             <form id="add-project-form" class="contact-form">
                 <input type="text" id="project-title" placeholder="Project Titel" required>
                 <textarea id="project-description" rows="4" placeholder="Project Beschrijving" required></textarea>
-                <input type="url" id="project-image-url" placeholder="Afbeelding URL" required>
+                <label style="font-size: 0.9rem; color: var(--text-dim);">Project foto selecteren:</label>
+                <input type="file" id="project-image-file" accept="image/*" required>
                 <button type="submit" class="btn" id="add-project-btn">Project Toevoegen</button>
                 <p id="project-status" style="margin-top: 15px; display: none;"></p>
             </form>
@@ -88,24 +89,47 @@
             e.preventDefault();
             const title = document.getElementById('project-title').value;
             const description = document.getElementById('project-description').value;
-            const imageUrl = document.getElementById('project-image-url').value;
+            const imageFile = document.getElementById('project-image-file').files[0];
             const addProjectBtn = document.getElementById('add-project-btn');
             const projectStatus = document.getElementById('project-status');
 
             addProjectBtn.disabled = true;
-            addProjectBtn.innerText = 'Project toevoegen...';
+            addProjectBtn.innerText = 'Bezig met uploaden...';
             projectStatus.style.display = 'none';
 
-            const { error } = await supabaseClient.from('projects').insert([{ title, description, imageUrl }]);
+            try {
+                // 1. Upload foto naar Supabase Storage
+                const fileName = `${Date.now()}-${imageFile.name}`;
+                const { data: uploadData, error: uploadError } = await supabaseClient
+                    .storage
+                    .from('project-images')
+                    .upload(fileName, imageFile);
 
-            if (error) {
-                projectStatus.innerText = 'Fout bij toevoegen project: ' + error.message;
-                projectStatus.style.color = 'red';
-            } else {
+                if (uploadError) throw uploadError;
+
+                // 2. Verkrijg de publieke URL
+                const { data: publicUrlData } = supabaseClient
+                    .storage
+                    .from('project-images')
+                    .getPublicUrl(fileName);
+
+                const imageUrl = publicUrlData.publicUrl;
+
+                // 3. Project opslaan in de database
+                const { error: dbError } = await supabaseClient
+                    .from('projects')
+                    .insert([{ title, description, imageUrl }]);
+
+                if (dbError) throw dbError;
+
                 projectStatus.innerText = 'Project succesvol toegevoegd!';
                 projectStatus.style.color = 'green';
                 document.getElementById('add-project-form').reset();
+            } catch (err) {
+                projectStatus.innerText = 'Fout: ' + err.message;
+                projectStatus.style.color = 'red';
             }
+            
             projectStatus.style.display = 'block';
             addProjectBtn.disabled = false;
             addProjectBtn.innerText = 'Project Toevoegen';
