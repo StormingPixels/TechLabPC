@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afspraak Plannen | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">TechLabPC</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="diensten.html">Diensten</a></li>
+                <li><a href="afspraak-maken.html" class="active">Afspraak</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container">
+            <h2 class="section-title">Plan je afspraak</h2>
+            <p class="section-subtitle">Kies een beschikbaar moment en we zien je dan!</p>
+
+            <div id="booking-container" style="max-width: 600px; margin: 0 auto;">
+                <div id="slots-grid" style="display: grid; gap: 15px; margin-bottom: 2rem;">
+                    <!-- Slots laden hier -->
+                </div>
+
+                <form id="booking-form" class="contact-form" style="display: none; background: var(--section-alt); padding: 2rem; border-radius: 10px;">
+                    <h3 id="selected-slot-title" style="margin-bottom: 1rem;"></h3>
+                    <input type="hidden" id="slot-id">
+                    <input type="text" id="cust-name" placeholder="Je Naam" required>
+                    <input type="email" id="cust-email" placeholder="Je E-mailadres" required>
+                    <select id="cust-service" required>
+                        <option value="PC Reparatie">PC Reparatie / Check</option>
+                        <option value="Console Reiniging">Console Reiniging</option>
+                        <option value="Custom Build">Custom Build Advies</option>
+                    </select>
+                    <textarea id="cust-msg" placeholder="Korte omschrijving van het probleem"></textarea>
+                    <button type="submit" class="btn">Bevestig Afspraak</button>
+                </form>
+                <p id="booking-status" style="display:none; text-align:center; margin-top: 1rem; font-weight: bold;"></p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function loadAvailableSlots() {
+            const { data, error } = await supabaseClient
+                .from('schedule')
+                .select('*')
+                .eq('status', 'available')
+                .gte('start_time', new Date().toISOString())
+                .order('start_time', { ascending: true });
+
+            const grid = document.getElementById('slots-grid');
+            if (data.length === 0) {
+                grid.innerHTML = '<p style="text-align:center;">Op dit moment zijn er geen vrije plekken beschikbaar. Neem contact op voor meer info.</p>';
+                return;
+            }
+
+            grid.innerHTML = data.map(slot => {
+                const d = new Date(slot.start_time);
+                return `
+                    <button class="btn btn-outline" style="margin:0; text-align:left;" onclick="selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')">
+                        ${d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })} om ${d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        window.selectSlot = (id, label) => {
+            document.getElementById('slot-id').value = id;
+            document.getElementById('selected-slot-title').innerText = "Boeken voor: " + label;
+            document.getElementById('booking-form').style.display = 'block';
+            document.getElementById('booking-form').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        document.getElementById('booking-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('slot-id').value;
+            const status = document.getElementById('booking-status');
+            
+            const updateData = {
+                customer_name: document.getElementById('cust-name').value,
+                customer_email: document.getElementById('cust-email').value,
+                service_type: document.getElementById('cust-service').value,
+                message: document.getElementById('cust-msg').value,
+                status: 'booked'
+            };
+
+            const { error } = await supabaseClient
+                .from('schedule')
+                .update(updateData)
+                .eq('id', id);
+
+            if (error) {
+                status.innerText = "Er ging iets mis: " + error.message;
+                status.style.color = "red";
+            } else {
+                status.innerText = "Afspraak succesvol gepland! We hebben je gegevens ontvangen.";
+                status.style.color = "green";
+                document.getElementById('booking-form').style.display = 'none';
+                loadAvailableSlots();
+            }
+            status.style.display = 'block';
+        });
+
+        loadAvailableSlots();
+    </script>
+</body>
+</html>

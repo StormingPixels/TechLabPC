@@ -35,8 +35,23 @@
     </nav>
 
     <section id="admin-panel" class="page-start" style="padding: 100px 0;">
-        <div class="container" style="max-width: 600px; margin: 0 auto;">
+        <div class="container" style="max-width: 800px; margin: 0 auto;">
             <h2 id="admin-greeting" class="section-title" style="font-size: 1.5rem; color: var(--text-dim); margin-bottom: 0.5rem; text-align: left;">Bezig met laden...</h2>
+            
+            <!-- Planning Sectie -->
+            <div style="background: var(--section-alt); padding: 2rem; border-radius: 15px; margin-bottom: 3rem;">
+                <h2 class="section-title" style="text-align: left; font-size: 1.8rem;">Agenda Beheren</h2>
+                <p style="margin-bottom: 1rem;">Voeg momenten toe waarop je beschikbaar bent voor werk.</p>
+                <form id="add-slot-form" class="contact-form" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="datetime-local" id="slot-time" required style="flex: 2;">
+                    <button type="submit" class="btn" style="margin-top: 0;">Slot Toevoegen</button>
+                </form>
+                <div id="admin-slots-list" style="margin-top: 2rem;">
+                    <!-- Hier komen je geplande slots -->
+                </div>
+            </div>
+
+            <!-- Projecten Sectie -->
             <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Project Toevoegen</h2>
             <form id="add-project-form" class="contact-form">
                 <input type="text" id="project-title" placeholder="Project Titel" required>
@@ -71,6 +86,7 @@
                 window.location.href = 'admin-login.html';
                 return;
             }
+            loadAdminSlots();
 
             // Haal de display_name op uit de profiles tabel
             const { data: profile } = await supabaseClient
@@ -87,6 +103,50 @@
             }
         }
         checkAuth();
+
+        // Planning functies voor Admin
+        async function loadAdminSlots() {
+            const { data, error } = await supabaseClient
+                .from('schedule')
+                .select('*')
+                .order('start_time', { ascending: true });
+            
+            const list = document.getElementById('admin-slots-list');
+            if (error || !data) return;
+
+            list.innerHTML = '<h3>Je planning:</h3>' + data.map(slot => {
+                const date = new Date(slot.start_time).toLocaleString('nl-NL', { dateStyle: 'long', timeStyle: 'short' });
+                const isBooked = slot.status === 'booked';
+                return `
+                    <div style="padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: ${isBooked ? '#ffe6e6' : 'transparent'}">
+                        <div>
+                            <strong>${date}</strong> - 
+                            <span style="color: ${isBooked ? 'red' : 'green'}">${isBooked ? 'GEBOEKT door ' + slot.customer_name : 'Beschikbaar'}</span>
+                            ${isBooked ? `<br><small>${slot.service_type}: ${slot.message}</small>` : ''}
+                        </div>
+                        <button onclick="deleteSlot('${slot.id}')" style="background: none; border: none; color: red; cursor: pointer;">Verwijderen</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('add-slot-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const startTime = document.getElementById('slot-time').value;
+            const { error } = await supabaseClient.from('schedule').insert([{ start_time: startTime }]);
+            if (error) alert(error.message);
+            else {
+                document.getElementById('add-slot-form').reset();
+                loadAdminSlots();
+            }
+        });
+
+        window.deleteSlot = async (id) => {
+            if (confirm('Weet je zeker dat je dit slot wilt verwijderen?')) {
+                await supabaseClient.from('schedule').delete().eq('id', id);
+                loadAdminSlots();
+            }
+        };
 
         let selectedFiles = [];
 
