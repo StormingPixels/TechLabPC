@@ -2,7 +2,7 @@
     --bg-color: #ffffff;
     --section-alt: #f4f4f4;
     --card-bg: #ffffff;
-    --accent-color: #0077cc;
+    --accent-color: #A8B090;
     --text-main: #333333;
     --text-dim: #666666;
     --nav-height: 80px;
@@ -134,7 +134,7 @@ body {
 
 .btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 119, 204, 0.3);
+    box-shadow: 0 5px 15px rgba(168, 176, 144, 0.3);
 }
 
 .btn-secondary {
@@ -402,7 +402,7 @@ body {
 
 .service-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 12px 30px rgba(0, 119, 204, 0.15);
+    box-shadow: 0 12px 30px rgba(168, 176, 144, 0.15);
 }
 
 .card-image-wrapper {
