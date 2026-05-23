@@ -72,6 +72,15 @@
                 return;
             }
             // Haal de display_name op uit de profiles tabel
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('display_name')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            if (profile && profile.display_name) {
+                document.getElementById('admin-greeting').innerText = `Welkom, ${profile.display_name}`;
+            }
         }
         checkAuth();
 
