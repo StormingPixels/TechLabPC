@@ -44,7 +44,7 @@
         <div class="container" style="max-width: 800px; margin: 0 auto;">
             <h2 id="admin-greeting" class="section-title" style="text-align: left;">Welkom, beheerder</h2>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 2rem;">
+            <div class="admin-grid">
                 <a href="admin-agenda.html" class="btn" style="text-align: center; margin: 0; padding: 3rem 1rem;">
                     <i class="fa-solid fa-calendar-days" style="display: block; font-size: 2rem; margin-bottom: 10px;"></i>
                     Agenda Beheren
@@ -79,7 +79,13 @@
 
         const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
 
         // Check if user is logged in
         async function checkAuth() {
