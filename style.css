@@ -54,10 +54,15 @@ body {
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--accent-color);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    height: 50px; /* Je kunt dit vergroten of verkleinen naar smaak */
+    width: auto;
+    display: block;
 }
 
 .menu-toggle {
