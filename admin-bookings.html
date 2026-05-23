@@ -6,6 +6,7 @@
     <title>Ingeplande Afspraken | TechLabPC</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
@@ -19,8 +20,17 @@
 
     <section class="page-start">
         <div class="container" style="max-width: 800px;">
-            <h2 class="section-title" style="text-align: left;">Agenda Overzicht</h2>
-            <div id="admin-slots-list"><p>Laden...</p></div>
+            <h2 class="section-title" style="text-align: left;">Afspraken Bekijken</h2>
+            
+            <div class="calendar-header">
+                <button class="btn btn-outline" style="margin:0; padding: 5px 15px;" onclick="changeDate(-1)"><i class="fas fa-chevron-left"></i></button>
+                <h3 id="current-date-display" style="margin:0;">Laden...</h3>
+                <button class="btn btn-outline" style="margin:0; padding: 5px 15px;" onclick="changeDate(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div id="admin-slots-list" class="timeline">
+                <p>Zoeken naar afspraken...</p>
+            </div>
         </div>
     </section>
 
@@ -31,48 +41,60 @@
             auth: { persistSession: true, autoRefreshToken: true }
         });
 
+        let currentDate = new Date();
+
+        window.changeDate = (days) => {
+            currentDate.setDate(currentDate.getDate() + days);
+            renderView();
+        };
+
+        function renderView() {
+            const display = document.getElementById('current-date-display');
+            display.innerText = currentDate.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+            loadBookings();
+        }
+
         async function loadBookings() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = 'admin-login.html'; return; }
+
+            // Start en eind van de geselecteerde dag berekenen
+            const startOfDay = new Date(currentDate);
+            startOfDay.setHours(0,0,0,0);
+            const endOfDay = new Date(currentDate);
+            endOfDay.setHours(23,59,59,999);
 
             const { data, error } = await supabaseClient
                 .from('schedule')
                 .select('*')
                 .eq('status', 'booked')
-                .gte('start_time', new Date().toISOString())
+                .gte('start_time', startOfDay.toISOString())
+                .lte('start_time', endOfDay.toISOString())
                 .order('start_time', { ascending: true });
             
             const list = document.getElementById('admin-slots-list');
-            if (!data || data.length === 0) { list.innerHTML = '<p>Geen boekingen gevonden.</p>'; return; }
+            if (!data || data.length === 0) { 
+                list.innerHTML = '<p style="text-align:center; color:#999; padding: 40px 0;">Geen afspraken gepland voor deze dag.</p>'; 
+                return; 
+            }
 
-            // Groeperen per datum
-            const groups = data.reduce((acc, slot) => {
-                const date = new Date(slot.start_time).toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
-                if (!acc[date]) acc[date] = [];
-                acc[date].push(slot);
-                return acc;
-            }, {});
-
-            list.innerHTML = Object.keys(groups).map(date => `
-                <div style="margin-bottom: 2rem;">
-                    <h3 style="border-bottom: 2px solid var(--accent-color); padding-bottom: 5px; margin-bottom: 15px;">${date}</h3>
-                    ${groups[date].map(slot => {
-                        const time = new Date(slot.start_time).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-                        return `
-                            <div style="padding: 15px; background: #fff; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--accent-color); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: flex-start;">
-                                <div>
-                                    <strong>${time}</strong> - <span style="font-size: 1.1rem; color: #333;">${slot.customer_name}</span><br>
-                                    ${slot.customer_email ? `<small>E-mail: ${slot.customer_email}</small><br>` : ''}
-                                    <p style="margin-top: 5px;"><strong>${slot.service_type}:</strong> ${slot.message || 'Geen bericht'}</p>
-                                </div>
-                                <button onclick="deleteSlot('${slot.id}')" style="color: red; background: none; border: none; cursor: pointer; font-size: 1.2rem;" title="Verwijderen">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `).join('');
+            list.innerHTML = data.map(slot => {
+                const time = new Date(slot.start_time).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="timeline-event" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="position: absolute; left: -60px; top: 15px; font-weight: bold; color: var(--text-dim);">${time}</div>
+                        <div>
+                            <span style="font-size: 1.1rem; font-weight: bold; color: #333;">${slot.customer_name}</span><br>
+                            <small style="color: var(--accent-color);">${slot.service_type}</small>
+                            <p style="margin: 8px 0 0 0; font-size: 0.9rem;">${slot.message || 'Geen extra omschrijving'}</p>
+                            <small style="display:block; margin-top:5px; color: #888;">${slot.customer_email}</small>
+                        </div>
+                        <button onclick="deleteSlot('${slot.id}')" style="color: #ccc; background: none; border: none; cursor: pointer; font-size: 1.1rem;" onmouseover="this.style.color='red'" onmouseout="this.style.color='#ccc'">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
         }
 
         window.deleteSlot = async (id) => {
@@ -80,7 +102,8 @@
                 await supabaseClient.from('schedule').delete().eq('id', id); loadBookings();
             }
         };
-        loadBookings();
+        
+        renderView();
     </script>
 </body>
 </html>
