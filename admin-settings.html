@@ -36,7 +36,15 @@
     <script>
         const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: { persistSession: true, autoRefreshToken: true }
+        });
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) window.location.href = 'admin-login.html';
+            else loadHours();
+        }
 
         const days = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
 
@@ -46,7 +54,7 @@
 
             const container = document.getElementById('hours-container');
             container.innerHTML = data.map(row => `
-                <div style="display: grid; grid-template-columns: 120px 1fr 1fr 100px; gap: 15px; align-items: center; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                <div class="hours-row">
                     <strong>${days[row.day_of_week]}</strong>
                     <input type="time" name="open_${row.day_of_week}" value="${row.open_time || ''}" ${row.is_closed ? 'disabled' : ''}>
                     <input type="time" name="close_${row.day_of_week}" value="${row.close_time || ''}" ${row.is_closed ? 'disabled' : ''}>
@@ -88,7 +96,7 @@
             }
         });
 
-        loadHours();
+        checkAuth();
     </script>
 </body>
 </html>

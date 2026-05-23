@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingeplande Afspraken | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-panel.html" class="logo">Afspraken</a>
+            <ul class="nav-links">
+                <li><a href="admin-panel.html">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="section-title" style="text-align: left;">Wie komt er langs?</h2>
+            <div id="admin-slots-list"><p>Laden...</p></div>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true } });
+
+        async function loadBookings() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = 'admin-login.html'; return; }
+
+            const { data, error } = await supabaseClient
+                .from('schedule')
+                .select('*')
+                .eq('status', 'booked')
+                .order('start_time', { ascending: true });
+            
+            const list = document.getElementById('admin-slots-list');
+            if (!data || data.length === 0) { list.innerHTML = '<p>Geen boekingen gevonden.</p>'; return; }
+
+            list.innerHTML = data.map(slot => {
+                const date = new Date(slot.start_time).toLocaleString('nl-NL', { dateStyle: 'medium', timeStyle: 'short' });
+                return `
+                    <div style="padding: 15px; background: #fff; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid var(--accent-color); box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <strong>${date}</strong><br>
+                        <span style="font-size: 1.1rem; color: #333;">${slot.customer_name}</span><br>
+                        <small>E-mail: ${slot.customer_email}</small><br>
+                        <p style="margin-top: 5px;"><strong>${slot.service_type}:</strong> ${slot.message}</p>
+                        <button onclick="deleteSlot('${slot.id}')" style="color: red; background: none; border: none; cursor: pointer; margin-top: 10px;">Verwijderen</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.deleteSlot = async (id) => {
+            if (confirm('Afspraak verwijderen uit lijst?')) {
+                await supabaseClient.from('schedule').delete().eq('id', id); loadBookings();
+            }
+        };
+        loadBookings();
+    </script>
+</body>
+</html>
