@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Openingstijden Beheren | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-panel.html" class="logo">TechLabPC Instellingen</a>
+            <ul class="nav-links">
+                <li><a href="admin-panel.html">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="section-title" style="text-align: left;">Openingstijden Aanpassen</h2>
+            <p style="margin-bottom: 2rem;">Stel hier in wanneer klanten een afspraak kunnen inplannen.</p>
+
+            <form id="hours-form" class="contact-form">
+                <div id="hours-container" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Dynamisch geladen rijen -->
+                </div>
+                <button type="submit" class="btn" style="margin-top: 2rem;">Wijzigingen Opslaan</button>
+                <p id="status" style="margin-top: 1rem; display: none; font-weight: bold;"></p>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        const days = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+
+        async function loadHours() {
+            const { data, error } = await supabaseClient.from('opening_hours').select('*').order('day_of_week', { ascending: true });
+            if (error) return alert(error.message);
+
+            const container = document.getElementById('hours-container');
+            container.innerHTML = data.map(row => `
+                <div style="display: grid; grid-template-columns: 120px 1fr 1fr 100px; gap: 15px; align-items: center; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <strong>${days[row.day_of_week]}</strong>
+                    <input type="time" name="open_${row.day_of_week}" value="${row.open_time || ''}" ${row.is_closed ? 'disabled' : ''}>
+                    <input type="time" name="close_${row.day_of_week}" value="${row.close_time || ''}" ${row.is_closed ? 'disabled' : ''}>
+                    <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" name="closed_${row.day_of_week}" ${row.is_closed ? 'checked' : ''} onchange="toggleRow(${row.day_of_week}, this.checked)"> Gesloten
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        window.toggleRow = (day, isChecked) => {
+            document.querySelector(`[name="open_${day}"]`).disabled = isChecked;
+            document.querySelector(`[name="close_${day}"]`).disabled = isChecked;
+        };
+
+        document.getElementById('hours-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            const updates = [];
+
+            for (let i = 0; i < 7; i++) {
+                updates.push({
+                    day_of_week: i,
+                    open_time: document.querySelector(`[name="open_${i}"]`).value || null,
+                    close_time: document.querySelector(`[name="close_${i}"]`).value || null,
+                    is_closed: document.querySelector(`[name="closed_${i}"]`).checked
+                });
+            }
+
+            const { error } = await supabaseClient.from('opening_hours').upsert(updates);
+
+            status.style.display = 'block';
+            if (error) {
+                status.innerText = "Fout: " + error.message;
+                status.style.color = "red";
+            } else {
+                status.innerText = "Instellingen succesvol opgeslagen!";
+                status.style.color = "green";
+            }
+        });
+
+        loadHours();
+    </script>
+</body>
+</html>

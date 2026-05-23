@@ -57,11 +57,15 @@
             const now = new Date();
             const grid = document.getElementById('slots-grid');
             
-            // Check openingstijden (Maandag=1, Vrijdag=5)
-            const hour = now.getHours();
-            const day = now.getDay();
-            if (day === 0 || day === 6 || hour < 9 || hour >= 18) {
-                grid.innerHTML = '<div style="background:#f8d7da; padding:20px; border-radius:10px; color:#721c24; text-align:center;"><strong>GESLOTEN</strong><br>Buiten openingstijden kunt u geen afspraak plannen. We zijn bereikbaar op Ma-Vr tussen 09:00 en 18:00.</div>';
+            // Haal openingstijden op
+            const { data: hours } = await supabaseClient.from('opening_hours').select('*');
+            const currentDay = now.getDay();
+            const todaysHours = hours.find(h => h.day_of_week === currentDay);
+            
+            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+            if (todaysHours.is_closed || currentTimeStr < todaysHours.open_time || currentTimeStr >= todaysHours.close_time) {
+                grid.innerHTML = `<div style="background:#f8d7da; padding:20px; border-radius:10px; color:#721c24; text-align:center;"><strong>GESLOTEN</strong><br>Buiten openingstijden kunt u geen afspraak plannen.<br>Vandaag zijn we ${todaysHours.is_closed ? 'gesloten' : `geopend van ${todaysHours.open_time.slice(0,5)} tot ${todaysHours.close_time.slice(0,5)}`}.</div>`;
                 return;
             }
 
