@@ -58,44 +58,51 @@
         async function loadAvailableSlots() {
             const now = new Date();
             const grid = document.getElementById('slots-grid');
+            grid.innerHTML = '<p style="text-align:center;">Beschikbare tijden laden...</p>';
             
             // Haal openingstijden op
             const { data: hours } = await supabaseClient.from('opening_hours').select('*');
-            const currentDay = now.getDay();
-            const todaysHours = hours.find(h => h.day_of_week === currentDay);
-            
-            const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
-            if (todaysHours.is_closed || currentTimeStr < todaysHours.open_time || currentTimeStr >= todaysHours.close_time) {
-                grid.innerHTML = `<div style="background:#fff3cd; padding:20px; border-radius:10px; color:#856404; text-align:center; border: 1px solid #ffeeba;">
-                    <strong>LET OP: Buiten openingstijden</strong><br>
-                    U kunt momenteel geen tijdstip selecteren omdat wij gesloten zijn. Kom morgen terug of gebruik het <a href="contact.html" style="color: inherit; text-decoration: underline;">contactformulier</a> voor vragen.
-                </div>`;
-            } else {
-                const { data, error } = await supabaseClient
-                    .from('schedule')
-                    .select('*')
-                    .gte('start_time', now.toISOString())
-                    .order('start_time', { ascending: true });
+            // Haal toekomstige slots op
+            const { data: slots, error } = await supabaseClient
+                .from('schedule')
+                .select('*')
+                .gte('start_time', now.toISOString())
+                .order('start_time', { ascending: true });
 
-                if (!data || data.length === 0) {
-                    grid.innerHTML = '<div style="background:#f4f4f4; padding:20px; border-radius:10px; text-align:center;"><strong>GEEN SLOTS BESCHIKBAAR</strong><br>Er zijn momenteel geen vrije momenten gepland voor vandaag.</div>';
-                } else {
-                    grid.innerHTML = data.map(slot => {
-                        const d = new Date(slot.start_time);
-                        const isBooked = slot.status === 'booked';
-                        return `
-                            <button class="btn ${isBooked ? 'btn-secondary' : 'btn-outline'}" 
-                                    style="margin:0; text-align:left; opacity: ${isBooked ? '0.6' : '1'};" 
-                                    onclick="${isBooked ? '' : `selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')`}"
-                                    ${isBooked ? 'disabled' : ''}>
-                                ${d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })} om ${d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
-                                ${isBooked ? ' - (AL BEZET)' : ''}
-                            </button>
-                        `;
-                    }).join('');
-                }
+            if (error || !slots || slots.length === 0) {
+                grid.innerHTML = '<div style="background:#f4f4f4; padding:20px; border-radius:10px; text-align:center;">Er zijn momenteel geen vrije momenten gepland.</div>';
+                return;
             }
+
+            // Filter slots: alleen slots die binnen de openingstijden vallen
+            const validSlots = slots.filter(slot => {
+                const d = new Date(slot.start_time);
+                const dayHours = hours.find(h => h.day_of_week === d.getDay());
+                if (!dayHours || dayHours.is_closed) return false;
+                
+                const slotTimeStr = d.getHours().toString().padStart(2, '0') + ":" + d.getMinutes().toString().padStart(2, '0');
+                return slotTimeStr >= dayHours.open_time && slotTimeStr < dayHours.close_time;
+            });
+
+            if (validSlots.length === 0) {
+                grid.innerHTML = '<div style="background:#f4f4f4; padding:20px; border-radius:10px; text-align:center;">Geen beschikbare tijden gevonden binnen onze openingstijden.</div>';
+                return;
+            }
+
+            grid.innerHTML = validSlots.map(slot => {
+                const d = new Date(slot.start_time);
+                const isBooked = slot.status === 'booked';
+                return `
+                    <button class="btn ${isBooked ? 'btn-secondary' : 'btn-outline'}" 
+                            style="margin:0; text-align:left; opacity: ${isBooked ? '0.6' : '1'};" 
+                            onclick="${isBooked ? '' : `selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')`}"
+                            ${isBooked ? 'disabled' : ''}>
+                        ${d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })} om ${d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
+                        ${isBooked ? ' - (AL BEZET)' : ''}
+                    </button>
+                `;
+            }).join('');
         }
 
         window.selectSlot = (id, label) => {
