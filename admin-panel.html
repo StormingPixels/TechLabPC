@@ -9,6 +9,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#A8B090">
     <link rel="apple-touch-icon" href="https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png">
+    <!-- Font Awesome voor Dashboard Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png">
     <link rel="stylesheet" href="style.css">
@@ -100,145 +102,6 @@
             }
         }
         checkAuth();
-
-        // Planning functies voor Admin
-        async function loadAdminSlots() {
-            const { data, error } = await supabaseClient
-                .from('schedule')
-                .select('*')
-                .order('start_time', { ascending: true });
-            
-            const list = document.getElementById('admin-slots-list');
-            if (error || !data) return;
-
-            list.innerHTML = '<h3>Je planning:</h3>' + data.map(slot => {
-                const date = new Date(slot.start_time).toLocaleString('nl-NL', { dateStyle: 'long', timeStyle: 'short' });
-                const isBooked = slot.status === 'booked';
-                return `
-                    <div style="padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: ${isBooked ? '#ffe6e6' : 'transparent'}">
-                        <div>
-                            <strong>${date}</strong> - 
-                            <span style="color: ${isBooked ? 'red' : 'green'}">${isBooked ? 'GEBOEKT door ' + slot.customer_name : 'Beschikbaar'}</span>
-                            ${isBooked ? `<br><small>${slot.service_type}: ${slot.message}</small>` : ''}
-                        </div>
-                        <button onclick="deleteSlot('${slot.id}')" style="background: none; border: none; color: red; cursor: pointer;">Verwijderen</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        document.getElementById('add-slot-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const startTime = document.getElementById('slot-time').value;
-            const { error } = await supabaseClient.from('schedule').insert([{ start_time: startTime }]);
-            if (error) alert(error.message);
-            else {
-                document.getElementById('add-slot-form').reset();
-                loadAdminSlots();
-            }
-        });
-
-        window.deleteSlot = async (id) => {
-            if (confirm('Weet je zeker dat je dit slot wilt verwijderen?')) {
-                await supabaseClient.from('schedule').delete().eq('id', id);
-                loadAdminSlots();
-            }
-        };
-
-        let selectedFiles = [];
-
-        document.getElementById('project-image-file').addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    selectedFiles.push({ file, preview: event.target.result });
-                    renderPreviews();
-                };
-                reader.readAsDataURL(file);
-            });
-        });
-
-        function renderPreviews() {
-            const container = document.getElementById('reorder-preview');
-            container.innerHTML = selectedFiles.map((item, index) => `
-                <div class="reorder-item">
-                    <img src="${item.preview}" alt="Preview">
-                    <div class="reorder-controls">
-                        <button type="button" onclick="moveItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>↑</button>
-                        <button type="button" onclick="moveItem(${index}, 1)" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
-                        <button type="button" onclick="removeItem(${index})" style="color: red;">✕</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.moveItem = (index, direction) => {
-            const newIndex = index + direction;
-            if (newIndex < 0 || newIndex >= selectedFiles.length) return;
-            [selectedFiles[index], selectedFiles[newIndex]] = [selectedFiles[newIndex], selectedFiles[index]];
-            renderPreviews();
-        };
-
-        window.removeItem = (index) => {
-            selectedFiles.splice(index, 1);
-            renderPreviews();
-        };
-
-        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (selectedFiles.length === 0) return alert("Selecteer minstens één foto.");
-
-            const title = document.getElementById('project-title').value;
-            const description = document.getElementById('project-description').value;
-            const addProjectBtn = document.getElementById('add-project-btn');
-            const projectStatus = document.getElementById('project-status');
-
-            addProjectBtn.disabled = true;
-            addProjectBtn.innerText = `Uploaden (0/${selectedFiles.length})...`;
-            projectStatus.style.display = 'none';
-
-            try {
-                const uploadedUrls = [];
-
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    addProjectBtn.innerText = `Uploaden (${i + 1}/${selectedFiles.length})...`;
-                    const fileObj = selectedFiles[i].file;
-                    const fileName = `${Date.now()}-${fileObj.name}`;
-                    
-                    const { data, error: uploadError } = await supabaseClient
-                        .storage
-                        .from('project-images')
-                        .upload(fileName, fileObj);
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: urlData } = supabaseClient.storage.from('project-images').getPublicUrl(fileName);
-                    uploadedUrls.push(urlData.publicUrl);
-                }
-
-                // Sla de lijst met URL's op
-                const { error: dbError } = await supabaseClient
-                    .from('projects')
-                    .insert([{ title, description, imageUrl: uploadedUrls }]);
-
-                if (dbError) throw dbError;
-
-                projectStatus.innerText = 'Project succesvol toegevoegd!';
-                projectStatus.style.color = 'green';
-                selectedFiles = [];
-                document.getElementById('reorder-preview').innerHTML = '';
-                document.getElementById('add-project-form').reset();
-            } catch (err) {
-                projectStatus.innerText = 'Fout: ' + err.message;
-                projectStatus.style.color = 'red';
-            }
-            
-            projectStatus.style.display = 'block';
-            addProjectBtn.disabled = false;
-            addProjectBtn.innerText = 'Project Toevoegen';
-        });
-
         document.getElementById('logout-btn').addEventListener('click', async () => {
             const { error } = await supabaseClient.auth.signOut();
             if (!error) {
