@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recensies Beheren | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-panel.html" class="logo">TechLabPC Beheer</a>
+            <ul class="nav-links">
+                <li><a href="admin-panel.html">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="section-title" style="text-align: left;">Klantenrecensies</h2>
+            <p style="margin-bottom: 2rem;">Hieronder staan alle recensies die op de website zijn geplaatst.</p>
+            
+            <div id="admin-reviews-list">
+                <p>Laden...</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: { persistSession: true, autoRefreshToken: true }
+        });
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) window.location.href = 'admin-login.html';
+            else loadReviews();
+        }
+
+        async function loadReviews() {
+            const { data, error } = await supabaseClient
+                .from('reviews')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            const list = document.getElementById('admin-reviews-list');
+            if (error || !data || data.length === 0) {
+                list.innerHTML = '<p>Geen recensies gevonden.</p>';
+                return;
+            }
+
+            const getStars = (r) => '★'.repeat(r || 5) + '☆'.repeat(5 - (r || 5));
+
+            list.innerHTML = data.map(rev => `
+                <div style="padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div style="color: #ffcc00; margin-bottom: 5px;">${getStars(rev.rating)}</div>
+                        <strong>${rev.name}</strong>
+                        <p style="margin: 5px 0; font-size: 0.9rem;">"${rev.text}"</p>
+                        <small style="color: #999;">${new Date(rev.created_at).toLocaleDateString('nl-NL')}</small>
+                    </div>
+                    <button onclick="deleteReview('${rev.id}')" style="background: none; border: none; color: #ccc; cursor: pointer; font-size: 1.1rem;" onmouseover="this.style.color='red'" onmouseout="this.style.color='#ccc'">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.deleteReview = async (id) => {
+            if (confirm('Weet je zeker dat je deze recensie wilt verwijderen?')) {
+                const { error } = await supabaseClient.from('reviews').delete().eq('id', id);
+                if (error) alert(error.message);
+                else loadReviews();
+            }
+        };
+
+        checkAuth();
+    </script>
+</body>
+</html>
