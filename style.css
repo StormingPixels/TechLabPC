@@ -355,15 +355,29 @@ body {
     flex-wrap: wrap;
     gap: 10px;
     margin: 15px 0;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 
 .reorder-item {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
+    background: #eee;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
-.reorder-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
+.reorder-item img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; 
+    border-radius: 5px; 
+}
 .reorder-controls { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: space-around; }
 .reorder-controls button { background: none; border: none; color: white; cursor: pointer; padding: 2px; }
 
