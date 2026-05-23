@@ -371,6 +371,21 @@ body {
     border-radius: 5px;
 }
 
+/* Container voor dubbele knoppen bij diensten */
+.cta-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 2rem;
+}
+
+.cta-buttons .btn {
+    margin-top: 0;
+    flex: 1;
+    text-align: center;
+    padding: 0.8rem 1rem; /* Iets minder horizontale padding zodat ze naast elkaar passen */
+    font-size: 0.9rem;
+}
+
 .reorder-item {
     position: relative;
     width: 80px;
@@ -465,10 +480,10 @@ body {
 .hours-row {
     display: grid; 
     grid-template-columns: 120px 1fr 1fr 100px; 
-    gap: 5px; 
+    gap: 15px; 
     align-items: center; 
     background: #fff; 
-    padding: 10px 5px; 
+    padding: 12px; 
     border-radius: 8px; 
     border: 1px solid #ddd;
 }
@@ -476,9 +491,9 @@ body {
 @media (max-width: 600px) {
     .hours-row {
         grid-template-columns: 1fr 1fr; /* Twee kolommen voor de tijden */
-        gap: 5px;
+        gap: 10px;
         font-size: 0.85rem;
-        padding: 8px 5px;
+        padding: 12px;
     }
     .hours-row strong {
         grid-column: span 2;
@@ -495,6 +510,10 @@ body {
         padding: 8px;
         font-size: 0.85rem;
         width: 100%;
+    }
+
+    .cta-buttons {
+        flex-direction: column; /* Op hele kleine schermen knoppen onder elkaar */
     }
 }
 
