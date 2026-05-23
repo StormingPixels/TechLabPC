@@ -68,7 +68,6 @@
             const { data, error } = await supabaseClient
                 .from('schedule')
                 .select('*')
-                .eq('status', 'available')
                 .gte('start_time', now.toISOString())
                 .order('start_time', { ascending: true });
 
@@ -79,9 +78,14 @@
 
             grid.innerHTML = data.map(slot => {
                 const d = new Date(slot.start_time);
+                const isBooked = slot.status === 'booked';
                 return `
-                    <button class="btn btn-outline" style="margin:0; text-align:left;" onclick="selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')">
+                    <button class="btn ${isBooked ? 'btn-secondary' : 'btn-outline'}" 
+                            style="margin:0; text-align:left; opacity: ${isBooked ? '0.6' : '1'};" 
+                            onclick="${isBooked ? '' : `selectSlot('${slot.id}', '${d.toLocaleString('nl-NL')}')`}"
+                            ${isBooked ? 'disabled' : ''}>
                         ${d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })} om ${d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })}
+                        ${isBooked ? ' - (AL BEZET)' : ''}
                     </button>
                 `;
             }).join('');

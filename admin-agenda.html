@@ -6,6 +6,7 @@
     <title>Agenda Beheer | TechLabPC</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -23,6 +24,15 @@
         <div class="container" style="max-width: 800px;">
             <h2 class="section-title" style="text-align: left;">Agenda Beheren</h2>
             
+            <div style="background: var(--section-alt); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; border: 1px solid #ddd;">
+                <h3>Google Agenda Koppelen</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-dim);">Plak hier de "Geheim adres in iCal-indeling" link uit je Google instellingen.</p>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="google-ical-url" placeholder="https://calendar.google.com/calendar/ical/.../basic.ics" style="flex: 3; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                    <button id="import-btn" onclick="importGoogleCalendar()" class="btn" style="margin: 0; flex: 1;">Importeren</button>
+                </div>
+            </div>
+
             <div style="background: var(--section-alt); padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
                 <h3>Nieuw slot toevoegen</h3>
                 <form id="add-slot-form" class="contact-form" style="display: flex; gap: 10px; margin-top: 1rem;">
@@ -97,6 +107,48 @@
                 loadAdminSlots();
             }
         };
+
+        async function importGoogleCalendar() {
+            const url = document.getElementById('google-ical-url').value;
+            const btn = document.getElementById('import-btn');
+            if (!url) return alert("Vul a.u.b. de iCal URL in.");
+            
+            btn.disabled = true;
+            btn.innerText = "Bezig...";
+
+            // Gebruik een proxy om CORS problemen te voorkomen bij het ophalen van Google data
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+            
+            try {
+                const response = await fetch(proxyUrl);
+                const text = await response.text();
+                const jcalData = ICAL.parse(text);
+                const comp = new ICAL.Component(jcalData);
+                const vevents = comp.getAllSubcomponents('vevent');
+                
+                const imports = vevents.map(vevent => {
+                    const event = new ICAL.Event(vevent);
+                    return {
+                        start_time: event.startDate.toJSDate().toISOString(),
+                        status: 'booked',
+                        customer_name: 'Google Agenda',
+                        service_type: 'Externe Afspraak',
+                        message: event.summary || 'Bezet'
+                    };
+                });
+
+                const { error } = await supabaseClient.from('schedule').insert(imports);
+                if (error) throw error;
+                
+                alert(`${imports.length} afspraken gesynchroniseerd!`);
+                loadAdminSlots();
+            } catch (err) {
+                alert("Fout bij importeren: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Importeren";
+            }
+        }
 
         checkAuth();
     </script>
