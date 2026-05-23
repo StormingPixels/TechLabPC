@@ -41,8 +41,11 @@
             <form id="add-project-form" class="contact-form">
                 <input type="text" id="project-title" placeholder="Project Titel" required>
                 <textarea id="project-description" rows="4" placeholder="Project Beschrijving" required></textarea>
-                <label style="font-size: 0.9rem; color: var(--text-dim);">Project foto selecteren:</label>
-                <input type="file" id="project-image-file" accept="image/*" required>
+                <label style="font-size: 0.9rem; color: var(--text-dim);">Project foto's selecteren (meerdere mogelijk):</label>
+                <input type="file" id="project-image-file" accept="image/*" multiple required>
+                
+                <div id="reorder-preview" class="admin-reorder-list"></div>
+
                 <button type="submit" class="btn" id="add-project-btn">Project Toevoegen</button>
                 <p id="project-status" style="margin-top: 15px; display: none;"></p>
             </form>
@@ -85,45 +88,89 @@
         }
         checkAuth();
 
+        let selectedFiles = [];
+
+        document.getElementById('project-image-file').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    selectedFiles.push({ file, preview: event.target.result });
+                    renderPreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function renderPreviews() {
+            const container = document.getElementById('reorder-preview');
+            container.innerHTML = selectedFiles.map((item, index) => `
+                <div class="reorder-item">
+                    <img src="${item.preview}" alt="Preview">
+                    <div class="reorder-controls">
+                        <button type="button" onclick="moveItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>↑</button>
+                        <button type="button" onclick="moveItem(${index}, 1)" ${index === selectedFiles.length - 1 ? 'disabled' : ''}>↓</button>
+                        <button type="button" onclick="removeItem(${index})" style="color: red;">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.moveItem = (index, direction) => {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= selectedFiles.length) return;
+            [selectedFiles[index], selectedFiles[newIndex]] = [selectedFiles[newIndex], selectedFiles[index]];
+            renderPreviews();
+        };
+
+        window.removeItem = (index) => {
+            selectedFiles.splice(index, 1);
+            renderPreviews();
+        };
+
         document.getElementById('add-project-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (selectedFiles.length === 0) return alert("Selecteer minstens één foto.");
+
             const title = document.getElementById('project-title').value;
             const description = document.getElementById('project-description').value;
-            const imageFile = document.getElementById('project-image-file').files[0];
             const addProjectBtn = document.getElementById('add-project-btn');
             const projectStatus = document.getElementById('project-status');
 
             addProjectBtn.disabled = true;
-            addProjectBtn.innerText = 'Bezig met uploaden...';
+            addProjectBtn.innerText = `Uploaden (0/${selectedFiles.length})...`;
             projectStatus.style.display = 'none';
 
             try {
-                // 1. Upload foto naar Supabase Storage
-                const fileName = `${Date.now()}-${imageFile.name}`;
-                const { data: uploadData, error: uploadError } = await supabaseClient
-                    .storage
-                    .from('project-images')
-                    .upload(fileName, imageFile);
+                const uploadedUrls = [];
 
-                if (uploadError) throw uploadError;
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    addProjectBtn.innerText = `Uploaden (${i + 1}/${selectedFiles.length})...`;
+                    const fileObj = selectedFiles[i].file;
+                    const fileName = `${Date.now()}-${fileObj.name}`;
+                    
+                    const { data, error: uploadError } = await supabaseClient
+                        .storage
+                        .from('project-images')
+                        .upload(fileName, fileObj);
 
-                // 2. Verkrijg de publieke URL
-                const { data: publicUrlData } = supabaseClient
-                    .storage
-                    .from('project-images')
-                    .getPublicUrl(fileName);
+                    if (uploadError) throw uploadError;
 
-                const imageUrl = publicUrlData.publicUrl;
+                    const { data: urlData } = supabaseClient.storage.from('project-images').getPublicUrl(fileName);
+                    uploadedUrls.push(urlData.publicUrl);
+                }
 
-                // 3. Project opslaan in de database
+                // Sla de lijst met URL's op
                 const { error: dbError } = await supabaseClient
                     .from('projects')
-                    .insert([{ title, description, imageUrl }]);
+                    .insert([{ title, description, imageUrl: uploadedUrls }]);
 
                 if (dbError) throw dbError;
 
                 projectStatus.innerText = 'Project succesvol toegevoegd!';
                 projectStatus.style.color = 'green';
+                selectedFiles = [];
+                document.getElementById('reorder-preview').innerHTML = '';
                 document.getElementById('add-project-form').reset();
             } catch (err) {
                 projectStatus.innerText = 'Fout: ' + err.message;

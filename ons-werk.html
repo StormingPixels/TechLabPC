@@ -74,11 +74,26 @@
                 return;
             }
 
-            container.innerHTML = data.map((project, index) => `
+            container.innerHTML = data.map((project, index) => {
+                const images = Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl];
+                const imageCount = Math.min(images.length, 4); // We ondersteunen collage tot 4 foto's
+                
+                let imageHtml = '';
+                if (images.length > 1) {
+                    imageHtml = `
+                        <div class="collage-grid count-${imageCount}">
+                            ${images.slice(0, 4).map(url => `<img src="${url}" alt="Project foto">`).join('')}
+                        </div>
+                    `;
+                } else {
+                    imageHtml = `<img src="${images[0]}" alt="${project.title}" loading="lazy">`;
+                }
+
+                return `
                 <div class="jw-strip ${index % 2 !== 0 ? 'jw-strip--reverse' : ''} ${index % 2 !== 0 ? 'jw-strip--shaded' : ''}">
                     <div class="container jw-strip__inner">
                         <div class="jw-strip__image">
-                            <img src="${project.imageUrl}" alt="${project.title}" loading="lazy">
+                            ${imageHtml}
                         </div>
                         <div class="jw-strip__content">
                             <div class="jw-content-box">
@@ -92,7 +107,8 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Mobile Menu Logic
