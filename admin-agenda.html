@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Beheer | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-panel.html" class="logo">TechLabPC Agenda</a>
+            <ul class="nav-links">
+                <li><a href="admin-panel.html">Dashboard</a></li>
+                <li><a href="admin-projects.html">Projecten</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="section-title" style="text-align: left;">Agenda Beheren</h2>
+            
+            <div style="background: var(--section-alt); padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                <h3>Nieuw slot toevoegen</h3>
+                <form id="add-slot-form" class="contact-form" style="display: flex; gap: 10px; margin-top: 1rem;">
+                    <input type="datetime-local" id="slot-time" required style="flex: 2;">
+                    <button type="submit" class="btn" style="margin: 0;">Toevoegen</button>
+                </form>
+            </div>
+
+            <div id="admin-slots-list">
+                <p>Laden...</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) window.location.href = 'admin-login.html';
+            else loadAdminSlots();
+        }
+
+        async function loadAdminSlots() {
+            const { data, error } = await supabaseClient
+                .from('schedule')
+                .select('*')
+                .order('start_time', { ascending: true });
+            
+            const list = document.getElementById('admin-slots-list');
+            if (!data || data.length === 0) {
+                list.innerHTML = '<p>Geen geplande momenten gevonden.</p>';
+                return;
+            }
+
+            list.innerHTML = data.map(slot => {
+                const date = new Date(slot.start_time).toLocaleString('nl-NL', { dateStyle: 'medium', timeStyle: 'short' });
+                const isBooked = slot.status === 'booked';
+                return `
+                    <div style="padding: 15px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: ${isBooked ? '#fff3cd' : '#fff'}; border-radius: 8px; margin-bottom: 10px;">
+                        <div>
+                            <strong>${date}</strong><br>
+                            <span style="color: ${isBooked ? '#856404' : 'green'}; font-weight: bold;">
+                                ${isBooked ? 'AFSPRAAK: ' + slot.customer_name : 'Beschikbaar'}
+                            </span>
+                            ${isBooked ? `<br><small>${slot.service_type}: ${slot.message}</small>` : ''}
+                        </div>
+                        <button onclick="deleteSlot('${slot.id}')" style="background: none; border: none; color: red; cursor: pointer; font-size: 1.2rem;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('add-slot-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const startTime = document.getElementById('slot-time').value;
+            const { error } = await supabaseClient.from('schedule').insert([{ start_time: startTime }]);
+            if (error) alert(error.message);
+            else {
+                document.getElementById('add-slot-form').reset();
+                loadAdminSlots();
+            }
+        });
+
+        window.deleteSlot = async (id) => {
+            if (confirm('Verwijderen?')) {
+                await supabaseClient.from('schedule').delete().eq('id', id);
+                loadAdminSlots();
+            }
+        };
+
+        checkAuth();
+    </script>
+</body>
+</html>

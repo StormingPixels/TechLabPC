@@ -54,16 +54,26 @@
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function loadAvailableSlots() {
+            const now = new Date();
+            const grid = document.getElementById('slots-grid');
+            
+            // Check openingstijden (Maandag=1, Vrijdag=5)
+            const hour = now.getHours();
+            const day = now.getDay();
+            if (day === 0 || day === 6 || hour < 9 || hour >= 18) {
+                grid.innerHTML = '<div style="background:#f8d7da; padding:20px; border-radius:10px; color:#721c24; text-align:center;"><strong>GESLOTEN</strong><br>Buiten openingstijden kunt u geen afspraak plannen. We zijn bereikbaar op Ma-Vr tussen 09:00 en 18:00.</div>';
+                return;
+            }
+
             const { data, error } = await supabaseClient
                 .from('schedule')
                 .select('*')
                 .eq('status', 'available')
-                .gte('start_time', new Date().toISOString())
+                .gte('start_time', now.toISOString())
                 .order('start_time', { ascending: true });
 
-            const grid = document.getElementById('slots-grid');
-            if (data.length === 0) {
-                grid.innerHTML = '<p style="text-align:center;">Op dit moment zijn er geen vrije plekken beschikbaar. Neem contact op voor meer info.</p>';
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div style="background:#fff3cd; padding:20px; border-radius:10px; color:#856404; text-align:center;"><strong>BEZET / VOLGEBOEKT</strong><br>Er zijn momenteel geen vrije momenten meer tijdens openingstijden. Probeer het later opnieuw.</div>';
                 return;
             }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | TechLabPC</title>
+    <title>Admin Dashboard | TechLabPC</title>
     <link rel="canonical" href="https://techlabpc.nl/admin-panel.html">
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://primary.jwwb.nl/public/v/r/p/temp-ybtehqbsjxucsprizuzy/techlabpc-logo-high.png">
@@ -36,34 +36,19 @@
 
     <section id="admin-panel" class="page-start" style="padding: 100px 0;">
         <div class="container" style="max-width: 800px; margin: 0 auto;">
-            <h2 id="admin-greeting" class="section-title" style="font-size: 1.5rem; color: var(--text-dim); margin-bottom: 0.5rem; text-align: left;">Bezig met laden...</h2>
+            <h2 id="admin-greeting" class="section-title" style="text-align: left;">Welkom, beheerder</h2>
             
-            <!-- Planning Sectie -->
-            <div style="background: var(--section-alt); padding: 2rem; border-radius: 15px; margin-bottom: 3rem;">
-                <h2 class="section-title" style="text-align: left; font-size: 1.8rem;">Agenda Beheren</h2>
-                <p style="margin-bottom: 1rem;">Voeg momenten toe waarop je beschikbaar bent voor werk.</p>
-                <form id="add-slot-form" class="contact-form" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <input type="datetime-local" id="slot-time" required style="flex: 2;">
-                    <button type="submit" class="btn" style="margin-top: 0;">Slot Toevoegen</button>
-                </form>
-                <div id="admin-slots-list" style="margin-top: 2rem;">
-                    <!-- Hier komen je geplande slots -->
-                </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 2rem;">
+                <a href="admin-agenda.html" class="btn" style="text-align: center; margin: 0; padding: 3rem 1rem;">
+                    <i class="fa-solid fa-calendar-days" style="display: block; font-size: 2rem; margin-bottom: 10px;"></i>
+                    Agenda Beheren
+                </a>
+                <a href="admin-projects.html" class="btn" style="text-align: center; margin: 0; padding: 3rem 1rem;">
+                    <i class="fa-solid fa-images" style="display: block; font-size: 2rem; margin-bottom: 10px;"></i>
+                    Projecten Toevoegen
+                </a>
             </div>
 
-            <!-- Projecten Sectie -->
-            <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Project Toevoegen</h2>
-            <form id="add-project-form" class="contact-form">
-                <input type="text" id="project-title" placeholder="Project Titel" required>
-                <textarea id="project-description" rows="4" placeholder="Project Beschrijving" required></textarea>
-                <label style="font-size: 0.9rem; color: var(--text-dim);">Project foto's selecteren (meerdere mogelijk):</label>
-                <input type="file" id="project-image-file" accept="image/*" multiple required>
-                
-                <div id="reorder-preview" class="admin-reorder-list"></div>
-
-                <button type="submit" class="btn" id="add-project-btn">Project Toevoegen</button>
-                <p id="project-status" style="margin-top: 15px; display: none;"></p>
-            </form>
             <button id="logout-btn" class="btn btn-secondary" style="margin-top: 20px;">Uitloggen</button>
         </div>
     </section>
@@ -86,21 +71,7 @@
                 window.location.href = 'admin-login.html';
                 return;
             }
-            loadAdminSlots();
-
             // Haal de display_name op uit de profiles tabel
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('display_name')
-                .eq('id', session.user.id)
-                .maybeSingle();
-
-            const greetingElement = document.getElementById('admin-greeting');
-            if (profile && profile.display_name) {
-                greetingElement.innerText = `Welkom terug, ${profile.display_name}!`;
-            } else {
-                greetingElement.innerText = "Welkom terug, Admin!";
-            }
         }
         checkAuth();
 

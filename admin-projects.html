@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projecten Beheer | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-panel.html" class="logo">TechLabPC Projecten</a>
+            <ul class="nav-links">
+                <li><a href="admin-panel.html">Dashboard</a></li>
+                <li><a href="admin-agenda.html">Agenda</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container" style="max-width: 600px;">
+            <h2 class="section-title" style="text-align: left;">Nieuw Project</h2>
+            <form id="add-project-form" class="contact-form">
+                <input type="text" id="project-title" placeholder="Project Titel" required>
+                <textarea id="project-description" rows="4" placeholder="Project Beschrijving" required></textarea>
+                <label style="font-size: 0.9rem; color: var(--text-dim);">Foto's selecteren:</label>
+                <input type="file" id="project-image-file" accept="image/*" multiple required>
+                <div id="reorder-preview" class="admin-reorder-list"></div>
+                <button type="submit" class="btn" id="add-project-btn">Uploaden en Opslaan</button>
+                <p id="project-status" style="margin-top: 15px; display: none;"></p>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let selectedFiles = [];
+        
+        document.getElementById('project-image-file').addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    selectedFiles.push({ file, preview: event.target.result });
+                    renderPreviews();
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function renderPreviews() {
+            const container = document.getElementById('reorder-preview');
+            container.innerHTML = selectedFiles.map((item, index) => `
+                <div class="reorder-item">
+                    <img src="${item.preview}" alt="Preview">
+                    <div class="reorder-controls">
+                        <button type="button" onclick="removeItem(${index})">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.removeItem = (i) => { selectedFiles.splice(i, 1); renderPreviews(); };
+
+        document.getElementById('add-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('add-project-btn');
+            btn.disabled = true;
+            btn.innerText = 'Uploaden...';
+
+            try {
+                const uploadedUrls = [];
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const fileObj = selectedFiles[i].file;
+                    const fileName = `${Date.now()}-${fileObj.name}`;
+                    await supabaseClient.storage.from('project-images').upload(fileName, fileObj);
+                    const { data: urlData } = supabaseClient.storage.from('project-images').getPublicUrl(fileName);
+                    uploadedUrls.push(urlData.publicUrl);
+                }
+                await supabaseClient.from('projects').insert([{ 
+                    title: document.getElementById('project-title').value, 
+                    description: document.getElementById('project-description').value, 
+                    imageUrl: uploadedUrls 
+                }]);
+                alert('Succes!');
+                location.reload();
+            } catch (err) { alert(err.message); btn.disabled = false; }
+        });
+    </script>
+</body>
+</html>
