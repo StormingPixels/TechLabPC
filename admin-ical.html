@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sync | TechLabPC</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.5.0/ical.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-panel.html" class="logo">Google Sync</a>
+            <ul class="nav-links">
+                <li><a href="admin-panel.html">Dashboard</a></li>
+                <li><a href="admin-agenda.html">Beschikbaarheid</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="page-start">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="section-title" style="text-align: left;">Google Agenda Koppelen</h2>
+            
+            <div style="background: var(--section-alt); padding: 2rem; border-radius: 15px; border: 1px solid #ddd;">
+                <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-dim);">Plak hier de "Geheim adres in iCal-indeling" link uit je Google instellingen.</p>
+                <div style="display: flex; gap: 10px; flex-direction: column;">
+                    <input type="text" id="google-ical-url" placeholder="https://calendar.google.com/calendar/ical/.../basic.ics" style="padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                    <button id="import-btn" onclick="importGoogleCalendar()" class="btn" style="margin: 0;">Afspraken Importeren</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const supabaseUrl = 'https://gynfsfqhzkwxpbxhkcdx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bmZzZnFoemt3eHBieGhrY2R4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MjM4OTAsImV4cCI6MjA5NDQ5OTg5MH0.FNQZX1eFu5IrnSoBBS7nTrfV3Ov7eQ8uA4RyU7oAW_0';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, { auth: { persistSession: true } });
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) window.location.href = 'admin-login.html';
+        }
+
+        async function importGoogleCalendar() {
+            const url = document.getElementById('google-ical-url').value;
+            const btn = document.getElementById('import-btn');
+            if (!url) return alert("Vul a.u.b. de iCal URL in.");
+            
+            btn.disabled = true;
+            btn.innerText = "Bezig met importeren...";
+
+            const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
+            
+            try {
+                const response = await fetch(proxyUrl);
+                const text = await response.text();
+                const jcalData = ICAL.parse(text);
+                const comp = new ICAL.Component(jcalData);
+                const vevents = comp.getAllSubcomponents('vevent');
+                
+                const imports = vevents.map(vevent => {
+                    const event = new ICAL.Event(vevent);
+                    return {
+                        start_time: event.startDate.toJSDate().toISOString(),
+                        status: 'booked',
+                        customer_name: 'Google Agenda',
+                        service_type: 'Externe Afspraak',
+                        message: event.summary || 'Bezet'
+                    };
+                });
+
+                // We voegen alleen toekomstige afspraken toe
+                const futureImports = imports.filter(i => new Date(i.start_time) > new Date());
+
+                const { error } = await supabaseClient.from('schedule').insert(futureImports);
+                if (error) throw error;
+                
+                alert(`${futureImports.length} toekomstige afspraken gesynchroniseerd!`);
+            } catch (err) {
+                alert("Fout bij importeren: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Afspraken Importeren";
+            }
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

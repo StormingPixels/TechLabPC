@@ -468,7 +468,7 @@ body {
     gap: 15px; 
     align-items: center; 
     background: #fff; 
-    padding: 15px; 
+    padding: 10px; 
     border-radius: 8px; 
     border: 1px solid #ddd;
 }
@@ -476,12 +476,17 @@ body {
 @media (max-width: 600px) {
     .hours-row {
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 8px;
+        font-size: 0.85rem;
     }
     .hours-row strong {
         grid-column: span 2;
         border-bottom: 1px solid #eee;
         padding-bottom: 5px;
+    }
+    .hours-row input[type="time"] {
+        padding: 5px;
+        font-size: 0.85rem;
     }
 }
 
