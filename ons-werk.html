@@ -99,15 +99,21 @@
             }
 
             container.innerHTML = data.map((project, index) => `
-                <div class="project-strip ${index % 2 !== 0 ? 'reverse' : ''}">
-                    <div class="project-strip-image">
-                        <img src="${project.imageUrl}" alt="${project.title}" loading="lazy">
-                    </div>
-                    <div class="project-strip-text">
-                        <span style="color: var(--accent-color); font-weight: bold; text-transform: uppercase; font-size: 0.8rem;">Project Details</span>
-                        <h3>${project.title}</h3>
-                        <p style="margin-bottom: 2rem;">${project.description}</p>
-                        <a href="contact.html" class="btn">Ook zoiets nodig?</a>
+                <div class="jw-strip ${index % 2 !== 0 ? 'jw-strip--reverse' : ''} ${index % 2 !== 0 ? 'jw-strip--shaded' : ''}">
+                    <div class="container jw-strip__inner">
+                        <div class="jw-strip__image">
+                            <img src="${project.imageUrl}" alt="${project.title}" loading="lazy">
+                        </div>
+                        <div class="jw-strip__content">
+                            <div class="jw-content-box">
+                                <span class="project-tag">Project Details</span>
+                                <h2 class="jw-heading-100">${project.title}</h2>
+                                <div class="jw-description">
+                                    <p>${project.description}</p>
+                                </div>
+                                <a href="contact.html" class="btn btn-outline">Ook zoiets nodig?</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `).join('');
