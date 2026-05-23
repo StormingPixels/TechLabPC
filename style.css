@@ -465,10 +465,10 @@ body {
 .hours-row {
     display: grid; 
     grid-template-columns: 120px 1fr 1fr 100px; 
-    gap: 15px; 
+    gap: 5px; 
     align-items: center; 
     background: #fff; 
-    padding: 12px; 
+    padding: 10px 5px; 
     border-radius: 8px; 
     border: 1px solid #ddd;
 }
@@ -476,8 +476,9 @@ body {
 @media (max-width: 600px) {
     .hours-row {
         grid-template-columns: 1fr 1fr; /* Twee kolommen voor de tijden */
-        gap: 10px;
+        gap: 5px;
         font-size: 0.85rem;
+        padding: 8px 5px;
     }
     .hours-row strong {
         grid-column: span 2;
