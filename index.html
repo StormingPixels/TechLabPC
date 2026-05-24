@@ -188,7 +188,11 @@
                 .order('created_at', { ascending: false })
                 .limit(2);
 
-            if (error) return console.error('Fout:', error);
+            if (error) {
+                console.error('Supabase Error (Reviews):', error);
+                return;
+            }
+            console.log('Homepage reviews opgehaald:', data);
             
             const container = document.getElementById('reviews-container');
             if (!data || data.length === 0) {

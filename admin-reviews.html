@@ -48,6 +48,11 @@
                 .select('*')
                 .order('created_at', { ascending: false });
             
+            if (error) {
+                console.error('Admin reviews error:', error);
+            }
+            console.log('Beheerpaneel reviews data:', data);
+            
             const list = document.getElementById('admin-reviews-list');
             if (error || !data || data.length === 0) {
                 list.innerHTML = '<p>Geen recensies gevonden.</p>';
