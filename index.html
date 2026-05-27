@@ -164,11 +164,11 @@
                     if (validImages.length > 1) {
                         imageHtml = `
                             <div class="collage-grid count-${imageCount}">
-                                ${validImages.slice(0, 4).map(url => `<img src="${url}" alt="Project foto" onerror="this.src='https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar'; console.error('Image failed:', url);">`).join('')}
+                                ${validImages.slice(0, 4).map(url => `<img src="${url}" alt="Project foto" onerror="handleImageError(this, '${url}')">`).join('')}
                             </div>
                         `;
                     } else {
-                        imageHtml = `<img src="${validImages[0]}" alt="${project.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar'; console.error('Image failed:', validImages[0]);">`;
+                        imageHtml = `<img src="${validImages[0]}" alt="${project.title}" loading="lazy" onerror="handleImageError(this, '${validImages[0]}')">`;
                     }
                 } else {
                     imageHtml = `<div style="width:100%; height:300px; background:#eee; display:flex; align-items:center; justify-content:center; border-radius:5px; color:#999;">Foto wordt geladen...</div>`;
@@ -194,6 +194,13 @@
                 </div>
                 `;
             }).join('');
+        }
+
+        // Debug functie om precies te zien wat er misgaat met de foto's
+        function handleImageError(img, url) {
+            console.error('❌ Foto laden mislukt voor URL:', url);
+            img.src = 'https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar';
+            img.onerror = null; // Voorkom oneindige lus
         }
 
         async function fetchReviews() {
