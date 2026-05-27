@@ -137,7 +137,11 @@
                 .limit(2);
 
             if (error) {
-                console.error('Fout bij laden projecten:', error);
+                console.error('Supabase Error (Projects):', error);
+                return;
+            }
+            if (!data) {
+                console.log('Geen project data gevonden.');
                 return;
             }
             console.log('Recente projecten opgehaald:', data);
@@ -146,12 +150,10 @@
             if (!data || data.length === 0) return;
 
             container.innerHTML = data.map((project, index) => {
-                // DEBUG: Bekijk in de console (F12) wat hier staat
-                console.log('Project data object:', project);
-
-                // Zoek naar de kolom ongeacht hoofdletters
-                const rawImages = project.imageUrl || project.imageurl || project.images;
+                // Haal afbeeldingen op uit verschillende mogelijke kolomnamen
+                const rawImages = project.imageUrl || project.imageurl || project.images || [];
                 const images = Array.isArray(rawImages) ? rawImages : [rawImages];
+                
                 // Filter op geldige tekst die een URL lijkt te zijn
                 const validImages = images.filter(url => url && typeof url === 'string' && (url.includes('http') || url.includes('/storage/v1/object/public/')));
                 
@@ -162,11 +164,11 @@
                     if (validImages.length > 1) {
                         imageHtml = `
                             <div class="collage-grid count-${imageCount}">
-                                ${validImages.slice(0, 4).map(url => `<img src="${url}" alt="Project foto" onerror="console.error('Image failed:', this.src)">`).join('')}
+                                ${validImages.slice(0, 4).map(url => `<img src="${url}" alt="Project foto" onerror="this.src='https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar'; console.error('Image failed:', url);">`).join('')}
                             </div>
                         `;
                     } else {
-                        imageHtml = `<img src="${validImages[0]}" alt="${project.title}" loading="lazy" onerror="console.error('Image failed:', this.src)">`;
+                        imageHtml = `<img src="${validImages[0]}" alt="${project.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar'; console.error('Image failed:', validImages[0]);">`;
                     }
                 } else {
                     imageHtml = `<div style="width:100%; height:300px; background:#eee; display:flex; align-items:center; justify-content:center; border-radius:5px; color:#999;">Foto wordt geladen...</div>`;
