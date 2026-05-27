@@ -140,11 +140,6 @@
                 console.error('Supabase Error (Projects):', error);
                 return;
             }
-            if (!data) {
-                console.log('Geen project data gevonden.');
-                return;
-            }
-            console.log('Recente projecten opgehaald:', data);
 
             const container = document.getElementById('recent-projects-container');
             if (!data || data.length === 0) return;
@@ -198,7 +193,6 @@
 
         // Debug functie om precies te zien wat er misgaat met de foto's
         function handleImageError(img, url) {
-            console.error('❌ Foto laden mislukt voor URL:', url);
             img.src = 'https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar';
             img.onerror = null; // Voorkom oneindige lus
         }
@@ -214,7 +208,6 @@
                 console.error('Supabase Error (Reviews):', error);
                 return;
             }
-            console.log('Homepage reviews opgehaald:', data);
             
             const container = document.getElementById('reviews-container');
             if (!data || data.length === 0) {

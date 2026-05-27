@@ -67,7 +67,6 @@
                 console.error('Fout bij laden:', error);
                 return;
             }
-            console.log('Alle projecten opgehaald:', data);
 
             const container = document.getElementById('projects-container');
             if (!data || data.length === 0) {
@@ -124,7 +123,6 @@
 
         // Debug functie om precies te zien wat er misgaat met de foto's
         function handleImageError(img, url) {
-            console.error('❌ Foto laden mislukt voor URL:', url);
             img.src = 'https://via.placeholder.com/600x400?text=Foto+niet+bereikbaar';
             img.onerror = null; // Voorkom oneindige lus
         }
