@@ -140,6 +140,7 @@
                 console.error('Fout bij laden projecten:', error);
                 return;
             }
+            console.log('Recente projecten opgehaald:', data);
 
             const container = document.getElementById('recent-projects-container');
             if (!data || data.length === 0) return;
