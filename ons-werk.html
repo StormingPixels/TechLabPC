@@ -76,7 +76,9 @@
             }
 
             container.innerHTML = data.map((project, index) => {
-                const images = Array.isArray(project.imageUrl) ? project.imageUrl : [project.imageUrl];
+                // Zoek naar imageUrl of imageurl (voor het geval dat)
+                const rawImages = project.imageUrl || project.imageurl || [];
+                const images = Array.isArray(rawImages) ? rawImages : [rawImages];
                 const imageCount = Math.min(images.length, 4); // We ondersteunen collage tot 4 foto's
                 
                 let imageHtml = '';
