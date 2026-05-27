@@ -146,10 +146,14 @@
             if (!data || data.length === 0) return;
 
             container.innerHTML = data.map((project, index) => {
-                // Zoek naar de kolom ongeacht hoofdletters en filter lege waarden
+                // DEBUG: Bekijk in de console (F12) wat hier staat
+                console.log('Project data object:', project);
+
+                // Zoek naar de kolom ongeacht hoofdletters
                 const rawImages = project.imageUrl || project.imageurl || project.images;
                 const images = Array.isArray(rawImages) ? rawImages : [rawImages];
-                const validImages = images.filter(url => url && typeof url === 'string' && url.includes('http'));
+                // Filter op geldige tekst die een URL lijkt te zijn
+                const validImages = images.filter(url => url && typeof url === 'string' && (url.includes('http') || url.includes('/storage/v1/object/public/')));
                 
                 const imageCount = Math.min(validImages.length, 4);
                 
