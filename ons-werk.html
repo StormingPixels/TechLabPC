@@ -76,30 +76,26 @@
             }
 
             container.innerHTML = data.map((project, index) => {
-                // Zoek naar imageUrl of imageurl en filter lege waarden
-                const rawImages = project.imageUrl || project.imageurl;
+                // Zoek naar de kolom ongeacht hoofdletters en filter lege waarden
+                const rawImages = project.imageUrl || project.imageurl || project.images;
                 const images = Array.isArray(rawImages) ? rawImages : [rawImages];
-                const validImages = images.filter(url => url && typeof url === 'string');
-
-                if (validImages.length === 0) {
-                    console.warn(`Project "${project.title}" heeft geen geldige afbeeldingen.`, project);
-                } else {
-                    console.log(`Afbeeldingen voor "${project.title}":`, validImages);
-                }
+                const validImages = images.filter(url => url && typeof url === 'string' && url.includes('http'));
 
                 const imageCount = Math.min(validImages.length, 4); 
                 
                 let imageHtml = '';
-                if (validImages.length > 1) {
-                    imageHtml = `
-                        <div class="collage-grid count-${imageCount}">
-                            ${validImages.slice(0, 4).map(url => `<img src="${url}" alt="Project foto" onerror="this.src='https://via.placeholder.com/500x500?text=Fout+Laden'">`).join('')}
-                        </div>
-                    `;
-                } else if (validImages.length === 1) {
-                    imageHtml = `<img src="${validImages[0]}" alt="${project.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/500x500?text=Fout+Laden'">`;
+                if (validImages.length > 0) {
+                    if (validImages.length > 1) {
+                        imageHtml = `
+                            <div class="collage-grid count-${imageCount}">
+                                ${validImages.slice(0, 4).map(url => `<img src="${url}" alt="Project foto" onerror="console.error('Image failed:', this.src)">`).join('')}
+                            </div>
+                        `;
+                    } else {
+                        imageHtml = `<img src="${validImages[0]}" alt="${project.title}" loading="lazy" onerror="console.error('Image failed:', this.src)">`;
+                    }
                 } else {
-                    imageHtml = `<div style="width:100%; height:300px; background:#eee; display:flex; align-items:center; justify-content:center; border-radius:5px;">Geen afbeelding beschikbaar</div>`;
+                    imageHtml = `<div style="width:100%; height:300px; background:#eee; display:flex; align-items:center; justify-content:center; border-radius:5px; color:#999;">Foto wordt geladen...</div>`;
                 }
 
                 return `
